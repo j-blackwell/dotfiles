@@ -11,3 +11,4 @@ sudo apt install snapd
 
 ## .bashrc
 ln $DOTFILES/config/.bashrc $HOME/.bashrc
+ln $DOTFILES/config/.gitconfig $HOME/.gitconfig
