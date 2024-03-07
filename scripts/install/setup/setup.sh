@@ -5,6 +5,11 @@ sudo apt install flatpak
 flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 
+## automatic updates
+sudo apt install unattended-upgrades
+sudo dpkg-reconfigure unattended-upgrades
+
+
 ## snap
 sudo apt update
 sudo apt install snapd
