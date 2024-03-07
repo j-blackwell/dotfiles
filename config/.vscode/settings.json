@@ -1,11 +1,8 @@
 {
-    "workbench.colorTheme": "Horla",
+    "workbench.colorTheme": "Default Dark+",
     "workbench.iconTheme": "vscode-icons",
     "editor.fontFamily": "'Droid Sans Mono', 'monospace', monospace",
-    "editor.fontSize": 16,
-    "python.pythonPath": "/users/jamesr/.pyenv/versions/dagster39/bin/python",
-    "python.testing.pytestEnabled": true,
-    "python.venvPath": "/users/jamesr/.pyenv/versions/",
+    "editor.fontSize": 20,
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -23,5 +20,14 @@
         "default": "right",
         "jupyter-notebook": "right"
     },
-    "editor.largeFileOptimizations": false
+    "editor.largeFileOptimizations": false,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "editor.rulers": [100]
+    },
+    "ruff.lint.run": "onType"
 }

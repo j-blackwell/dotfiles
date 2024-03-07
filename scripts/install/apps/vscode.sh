@@ -40,3 +40,7 @@ for extension in "${extensions[@]}"; do
 done
 
 echo "VS Code extensions have been installed."
+
+
+# config
+ln $DOTFILES/config/.vscode/settings.json $HOME/.config/Code/User/settings.json
