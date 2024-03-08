@@ -25,6 +25,7 @@ extensions=(
     shd101wyy.markdown-preview-enhanced
     vscode-icons-team.vscode-icons
     rust-lang.rust-analyzer
+    tamasfe.even-better-toml
 )
 
 # Get a list of all currently installed extensions.
