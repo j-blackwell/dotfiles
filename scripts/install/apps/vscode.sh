@@ -26,6 +26,7 @@ extensions=(
     vscode-icons-team.vscode-icons
     rust-lang.rust-analyzer
     tamasfe.even-better-toml
+    vscodevim.vim
 )
 
 # Get a list of all currently installed extensions.
