@@ -22,5 +22,4 @@ sudo tar -C /opt -xzf nvim-linux64.tar.gz
 echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >>~/.bashrc
 rm nvim-linux64.tar.gz
 
-git clone https://github.com/LazyVim/starter ~/.config/nvim/
-rm -rf ~/.config/nvim/.git
+git clone git@github.com:jrstats/neovim-config.git ~/.config/nvim/
