@@ -26,3 +26,5 @@ git clone git@github.com:jrstats/neovim-config.git ~/.config/nvim/
 echo 'alias nv-dotfiles="cd ~/code/dotfiles/ && nvim . -S Session.vim"' >>~/.bashrc
 echo 'alias nv-config="cd ~/.config/nvim/ && nvim . -S Session.vim"' >>~/.bashrc
 echo 'alias nv-bashrc="nvim ~/.bashrc"' >>~/.bashrc
+
+python3 -m pip install --user pynvim
