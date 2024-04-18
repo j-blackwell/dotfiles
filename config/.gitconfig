@@ -6,3 +6,5 @@
 [user]
 	name = James Robinson
 	email = 33688964+jrstats@users.noreply.github.com
+[fetch]
+  prune = true
