@@ -81,8 +81,17 @@ Setup wayland, greetd, wlr-randr and sway.
 
 ``` sh
 pacman -S --needed wayland
-pacman -S greetd-tuigreet sway swaylock swayidle swaybg wlr-randr
+pacman -S greetd-tuigreet sway swaylock swayidle swaybg
 systemctl enable greetd.service
+```
+
+## Monitors
+
+desktop monitors follow the following configuration
+
+``` sh
+pacman -S wlr-randr
+wlr-randr --output DP-1 --mode 1920x1080@165.003006 --pos 0,0 --rotate normal --output HDMI-A-1 --mode 1920x1080 --pos 1920,0
 ```
 
 ## SSH
