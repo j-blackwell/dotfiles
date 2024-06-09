@@ -22,6 +22,7 @@ ln -sf /home/james/code/dotfiles/ /path/to/symlink
 
 # backups
 sudo pacman -S timeshift
+sudo -E timeshift-gtki
 
 # bluetooth
 sudo pacman -S bluez bluez-utils
