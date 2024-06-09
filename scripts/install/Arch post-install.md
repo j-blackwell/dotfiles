@@ -1,5 +1,6 @@
 # Arch install
 This is a reference guide for post-install Arch.
+Losely based off the [General recommendations](https://wiki.archlinux.org/title/General_recommendationshttps://wiki.archlinux.org/title/General_recommendations).
 
 ## Terminal tools
 ``` sh
