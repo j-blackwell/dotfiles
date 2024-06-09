@@ -1,4 +1,4 @@
-# Arch install
+# Arch post-install
 This is a reference guide for post-install Arch.
 Losely based off the [General recommendations](https://wiki.archlinux.org/title/General_recommendationshttps://wiki.archlinux.org/title/General_recommendations).
 
@@ -75,7 +75,7 @@ Then run a full system upgrade.
 pacman -Syu
 ```
 
-# Graphics
+## Graphics
 
 Setup wayland, greetd and sway.
 
@@ -83,4 +83,14 @@ Setup wayland, greetd and sway.
 pacman -S --needed wayland
 pacman -S greetd-tuigreet sway swaylock swayidle swaybg
 systemctl enable greetd.service
+```
+
+## SSH
+
+Allow ssh over the network.
+
+``` sh
+sudo pacman -S openssh
+systemctl start sshd.service && systemctl enable sshd.service
+ip -br a | grep UP # grab the <ip_address> of form 192.168.x.x
 ```
