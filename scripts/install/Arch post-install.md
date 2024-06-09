@@ -77,11 +77,11 @@ pacman -Syu
 
 ## Graphics
 
-Setup wayland, greetd and sway.
+Setup wayland, greetd, wlr-randr and sway.
 
 ``` sh
 pacman -S --needed wayland
-pacman -S greetd-tuigreet sway swaylock swayidle swaybg
+pacman -S greetd-tuigreet sway swaylock swayidle swaybg wlr-randr
 systemctl enable greetd.service
 ```
 
