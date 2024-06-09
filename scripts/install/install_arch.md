@@ -1,0 +1,85 @@
+# Arch install
+This is a reference guide for post-install Arch.
+
+## Terminal tools
+``` sh
+pacman -S vim foot man git
+```
+
+
+## Users
+
+### Add
+Add users and add them to the `wheel` group (which will then allow sudo commands)
+
+``` sh
+useradd -m james
+passwd james
+usermod -aG wheel james
+```
+
+### Sudoers
+
+Edit the sudoers file using `visudo`. Uncomment the following line: `# %wheel ALL=(ALL:ALL) NOPASSWD: ALL`
+
+``` sh
+EDITOR=vim visudo
+```
+
+## Drives
+
+### Updating `fstab`
+If another drive has been mounted and you need to update `fstab`
+
+``` sh
+pacman -S arch-install-scripts
+genfstab -U /mnt >> /etc/fstab
+pacman -Rs arch-install-scripts
+```
+
+### Modify ownership
+If a home directory has been copied from another drive, update the user permissions:
+
+``` sh
+chown james -R /home/james
+```
+
+## Packages 
+
+### yay
+
+Setup the cli for interfacing with the AUR, yay.
+
+``` sh
+pacman -Sy --needed git base-devel
+git clone https://aur.archlinux.org/yay-bin.git
+cd yay-bin
+makepkg -si
+cd ..
+rm -rf ./yay-bin
+```
+
+### 32bit
+
+Allow 32bit applications by uncommenting the `[multilib]` section of the pacman config.
+
+``` sh
+vim /etc/pacman.conf
+```
+
+### system upgrade
+
+Then run a full system upgrade.
+``` sh
+pacman -Syu
+```
+
+# Graphics
+
+Setup wayland, greetd and sway.
+
+``` sh
+pacman -S --needed wayland
+pacman -S greetd-tuigreet sway swaylock swayidle swaybg
+systemctl enable greetd.service
+```
