@@ -5,10 +5,6 @@ sudo systemctl enable reflector.service && sudo systemctl start reflector.servic
 sudo systemctl enable fstrim.timer
 sudo systemctl enable paccache.timer
 
-# apps
-sudo pacman -S firefox flameshot lazygit nautilus neovim steam tmux
-yay -S ytmdesktop-bin albert
-
 # programming
 sudo pacman -S npm python3 python-pip python-virtualenv rust
 
@@ -36,3 +32,11 @@ yay -S bluetui
 sudo pacman -S pulseaudio lib32-libpulse lib32-alsa-plugins
 sudo systemctl --user enable dbus
 sudo systemctl --user enable pulseaudio
+
+# apps
+sudo pacman -S firefox flameshot lazygit nautilus neovim steam tmux
+yay -S ytmdesktop-bin albert
+
+# work
+sudo pacman -S docker mysql-workbench r
+yay -S google-chrome dropbox duckdb-bin google-cloud-cli slack-desktop
