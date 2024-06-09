@@ -18,7 +18,10 @@ fc-cache -fv
 
 # symlinks
 sudo pacman -S stow
-ln -sf /home/james/code/dotfiles/ /path/to/symlink
+cd ~
+git clone git@github.com:jrstats/dotfiles.git
+cd dotfiles
+stow --adopt .
 
 # backups
 sudo pacman -S timeshift
