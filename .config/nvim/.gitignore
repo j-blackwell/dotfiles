@@ -1,0 +1,12 @@
+tt.*
+.tests
+doc/tags
+debug
+.repro
+foo.*
+*.log
+data
+venv
+.luarc.json
+test.sh
+Session.vim

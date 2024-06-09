@@ -7,3 +7,5 @@
 	email = 33688964+jrstats@users.noreply.github.com
 [fetch]
   prune = true
+[pull]
+  ; ff = only
