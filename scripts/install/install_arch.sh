@@ -6,7 +6,7 @@ sudo systemctl enable fstrim.timer
 sudo systemctl enable paccache.timer
 
 # apps
-sudo pacman -S firefox flameshot nautilus neovim steam tmux
+sudo pacman -S firefox flameshot lazygit nautilus neovim steam tmux
 yay -S ytmdesktop-bin albert
 
 # programming
