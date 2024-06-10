@@ -77,23 +77,11 @@ pacman -Syu
 
 ## Graphics
 
-Setup xorg, greetd and i3.
+Setup xorg, gdm (login and display manager) and i3.
 
 ``` sh
-pacman -S greetd-tuigreet i3 feh
-systemctl enable greetd.service
-```
-
-Start i3 upon sign-in by modifying the `greetd` service.
-
-``` sh
-vim /etc/greetd/config.toml
-```
-
-``` toml
-[default_session]
-command = "tuigreet --cmd i3 --power-shutdown 'sudo systemctl poweroff' --asterisks --time --remember --user-menu"
-user=james
+pacman -S gdm i3 feh
+systemctl enable gdm.service
 ```
 
 
