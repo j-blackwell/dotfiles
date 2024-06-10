@@ -77,12 +77,23 @@ pacman -Syu
 
 ## Graphics
 
-Setup wayland, greetd, xwayland and sway.
+Setup xorg, greetd and i3.
 
 ``` sh
-pacman -S --needed wayland
-pacman -S greetd-tuigreet sway swaylock swayidle swaybg xorg-xwayland
+pacman -S greetd-tuigreet i3 feh
 systemctl enable greetd.service
+```
+
+Start i3 upon sign-in by modifying the `greetd` service.
+
+``` sh
+vim /etc/greetd/config.toml
+```
+
+``` toml
+[default_session]
+command = "tuigreet --cmd i3 --power-shutdown 'sudo systemctl poweroff' --asterisks --time --remember --user-menu"
+user=james
 ```
 
 
