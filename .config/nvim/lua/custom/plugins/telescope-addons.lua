@@ -8,19 +8,19 @@ return {
 			end,
 			desc = "[F]ind [F]iles",
 		},
-		{
-			"<leader>fd",
-			function()
-				require("telescope.builtin").find_files({
-					prompt_title = "Search for dotenv files",
-					cwd = vim.fn.getcwd(),
-					find_command = { "rg", "--files", "--glob", ".env*" },
-					file_ignore_patterns = {},
-					no_ignore = true,
-				})
-			end,
-			desc = "[F]ind [d]otenv files",
-		},
+        {
+          "<leader>fd",
+          function()
+            require("telescope.builtin").find_files({
+              prompt_title = "Search for dotfiles or .config files",
+              cwd = vim.fn.getcwd(),
+              find_command = { "rg", "--files", "--hidden", "--glob", ".*", "--glob", ".config/**" },
+              file_ignore_patterns = {},
+              no_ignore = true,
+            })
+          end,
+          desc = "[F]ind [d]otfiles or .config files",
+        },
 		{
 			"<leader>ft",
 			function()
