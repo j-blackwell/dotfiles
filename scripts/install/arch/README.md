@@ -1,16 +1,18 @@
 # Arch post-install
+
 This is a reference guide for post-install Arch.
 Losely based off the [General recommendations](https://wiki.archlinux.org/title/General_recommendations).
 
 ## Terminal tools
+
 ``` sh
 pacman -S vim foot man git
 ```
 
-
 ## Users
 
 ### Add
+
 Add users and add them to the `wheel` group (which will then allow sudo commands)
 
 ``` sh
@@ -21,15 +23,24 @@ usermod -aG wheel james
 
 ### Sudoers
 
-Edit the sudoers file using `visudo`. Uncomment the following line: `# %wheel ALL=(ALL:ALL) NOPASSWD: ALL`
+Edit the sudoers file using `visudo`.
+Uncomment the following line: `# %wheel ALL=(ALL:ALL) NOPASSWD: ALL`
 
 ``` sh
 EDITOR=vim visudo
 ```
 
+## GRUB
+
+Hide the GRUB menu on boot by modifying the GRUB config `/etc/default/grub`.
+Change `GRUB_TIMEOUT_STYLE` from "menu" to "hidden".
+Show the GRUB menu by holding ESC on boot.
+
+
 ## Drives
 
 ### Updating `fstab`
+
 If another drive has been mounted and you need to update `fstab`
 
 ``` sh
@@ -39,13 +50,14 @@ pacman -Rs arch-install-scripts
 ```
 
 ### Modify ownership
+
 If a home directory has been copied from another drive, update the user permissions:
 
 ``` sh
 chown james -R /home/james
 ```
 
-## Packages 
+## Packages
 
 ### yay
 
@@ -63,14 +75,16 @@ rm -rf ./yay-bin
 ### 32bit
 
 Allow 32bit applications by uncommenting the `[multilib]` section of the pacman config.
+Add `ILoveCandy` for a pacman feel.
 
 ``` sh
-vim /etc/pacman.conf
+sudo vim /etc/pacman.conf
 ```
 
 ### system upgrade
 
 Then run a full system upgrade.
+
 ``` sh
 pacman -Syu
 ```
@@ -83,7 +97,6 @@ Setup xorg, gdm (login and display manager) and i3.
 pacman -S gdm i3 feh
 systemctl enable gdm.service
 ```
-
 
 ## SSH
 

@@ -1,12 +1,14 @@
 # utils
-sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep
+sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep amd-ucode
 
 sudo systemctl enable reflector.service && sudo systemctl start reflector.service
 sudo systemctl enable fstrim.timer
 sudo systemctl enable paccache.timer
 
 # network
-sudo pacman -S ldns
+sudo pacman -S ldns ufw
+sudo ufw enable
+sudo systemctl enable ufw.service
 
 # graphics
 sudo pacman -S xdg-desktop-portal xdg-desktop-portal-wlr
