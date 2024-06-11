@@ -36,6 +36,12 @@ Hide the GRUB menu on boot by modifying the GRUB config `/etc/default/grub`.
 Change `GRUB_TIMEOUT_STYLE` from "menu" to "hidden".
 Show the GRUB menu by holding ESC on boot.
 
+Then update the GRUB config:
+
+``` sh
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+```
+
 
 ## Drives
 

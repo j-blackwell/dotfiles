@@ -45,6 +45,9 @@ sudo pacman -S pulseaudio lib32-libpulse lib32-alsa-plugins
 sudo systemctl --user enable dbus
 sudo systemctl --user enable pulseaudio
 
+# desktop
+sudo pacman -S rofi
+
 # apps
 sudo pacman -S firefox flameshot lazygit nautilus neovim steam tmux
 yay -S ytmdesktop-bin albert
