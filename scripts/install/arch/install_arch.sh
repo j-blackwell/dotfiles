@@ -11,7 +11,7 @@ sudo ufw enable
 sudo systemctl enable ufw.service
 
 # graphics
-sudo pacman -S xdg-desktop-portal xdg-desktop-portal-wlr
+sudo pacman -S xdg-desktop-portal xdg-desktop-portal-wlr ttf-font-awesome
 systemctl --user start xdg-desktop-portal-wlr.service
 
 # power
@@ -46,14 +46,12 @@ sudo systemctl --user enable dbus
 sudo systemctl --user enable pulseaudio
 
 # desktop
-sudo pacman -S rofi
+sudo pacman -S rofi polybar
 
 # apps
 sudo pacman -S firefox flameshot lazygit nautilus neovim steam tmux
-yay -S ytmdesktop-bin albert
+yay -S ytmdesktop-bin
 
 # work
 sudo pacman -S docker mysql-workbench r
 yay -S google-chrome dropbox duckdb-bin google-cloud-cli slack-desktop
-
-## edit google-chrome desktop entry for wayland (--ozone-platform=wayland)
