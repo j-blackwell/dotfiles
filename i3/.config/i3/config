@@ -67,8 +67,7 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 # bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
 
 # NOTE: Rofi
-bindsym $mod+d exec --no-startup-id rofi -show drun
-bindsym $mod+space exec --no-startup-id rofi -show combi
+bindsym $mod+space exec --no-startup-id rofi -show drun
 bindsym $mod+Tab exec --no-startup-id rofi -show window
 
 # NOTE: Navigation and layout
