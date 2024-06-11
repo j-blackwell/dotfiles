@@ -77,49 +77,13 @@ pacman -Syu
 
 ## Graphics
 
-Setup wayland, greetd, xwayland and sway.
+Setup xorg, gdm (login and display manager) and i3.
 
 ``` sh
-pacman -S --needed wayland
-pacman -S greetd-tuigreet sway swaylock swayidle swaybg xorg-xwayland
-systemctl enable greetd.service
+pacman -S gdm i3 feh
+systemctl enable gdm.service
 ```
 
-## Monitors
-
-desktop monitors follow the following configuration
-
-``` sh
-pacman -S wlr-randr
-wlr-randr --output DP-1 --mode 1920x1080@165.003006 --pos 0,0 --rotate normal --output HDMI-A-1 --mode 1920x1080 --pos 1920,0
-```
-
-Create a `systemd` service to run the script every boot.
-
-``` sh
-sudo vim /etc/systemd/system/set_display.service
-```
-
-Setting the contents to be:
-
-```
-[Unit]
-Description=Set display configuration with wlr-randr
-After=graphical.target
-
-[Service]
-ExecStart=/home/james/code/dotfiles/scripts/install/set_display.sh
-Restart=on-failure
-
-[Install]
-WantedBy=graphical.target
-```
-
-Then start and enable the service.
-
-``` sh
-sudo systemctl enable set_display.service && sudo systemctl start set_display.service
-```
 
 ## SSH
 
