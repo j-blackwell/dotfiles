@@ -1,5 +1,5 @@
 # utils
-sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep amd-ucode
+sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep amd-ucode jq
 
 sudo systemctl enable reflector.service && sudo systemctl start reflector.service
 sudo systemctl enable fstrim.timer

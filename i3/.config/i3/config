@@ -12,6 +12,7 @@ set $right l
 # NOTE: Graphics
 font pango:Martian Mono Nerd Font 12
 exec_always ~/dotfiles/scripts/src/set_display.sh
+exec_always ~/dotfiles/scripts/src/set_wallpaper_bing.sh
 
 
 # NOTE: Applets
