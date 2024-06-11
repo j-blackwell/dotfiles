@@ -6,7 +6,7 @@ Losely based off the [General recommendations](https://wiki.archlinux.org/title/
 ## Terminal tools
 
 ``` sh
-pacman -S vim foot man git
+pacman -S vim alacritty man git
 ```
 
 ## Users
