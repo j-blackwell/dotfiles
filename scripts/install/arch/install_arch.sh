@@ -5,6 +5,16 @@ sudo systemctl enable reflector.service && sudo systemctl start reflector.servic
 sudo systemctl enable fstrim.timer
 sudo systemctl enable paccache.timer
 
+# network
+sudo pacman -S ldns
+
+# graphics
+sudo pacman -S xdg-desktop-portal xdg-desktop-portal-wlr
+systemctl --user start xdg-desktop-portal-wlr.service
+
+# power
+sudo pacman -S upower
+
 # programming
 sudo pacman -S npm python3 python-pip python-virtualenv rust
 
@@ -40,3 +50,5 @@ yay -S ytmdesktop-bin albert
 # work
 sudo pacman -S docker mysql-workbench r
 yay -S google-chrome dropbox duckdb-bin google-cloud-cli slack-desktop
+
+## edit google-chrome desktop entry for wayland (--ozone-platform=wayland)
