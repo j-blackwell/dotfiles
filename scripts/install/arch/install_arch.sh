@@ -11,7 +11,7 @@ sudo ufw enable
 sudo systemctl enable ufw.service
 
 # graphics
-sudo pacman -S xdg-desktop-portal xdg-desktop-portal-wlr ttf-font-awesome
+sudo pacman -S xdg-desktop-portal xdg-desktop-portal-wlr
 systemctl --user start xdg-desktop-portal-wlr.service
 
 # power
@@ -21,7 +21,7 @@ sudo pacman -S upower
 sudo pacman -S npm python3 python-pip python-virtualenv rust
 
 # fonts
-sudo pacman -S ttf-martian-mono-nerd
+sudo pacman -S ttf-martian-mono-nerd ttf-font-awesome noto-fonts-emoji
 fc-cache -fv
 
 # symlinks
