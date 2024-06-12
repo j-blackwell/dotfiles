@@ -8,6 +8,7 @@ set $left h
 set $down j
 set $up k
 set $right l
+focus_follows_mouse no
 
 # NOTE: Graphics
 font pango:Martian Mono Nerd Font 12
@@ -60,6 +61,8 @@ bindsym $mod+Shift+s exec flameshot gui
 bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+d exec ~/dotfiles/scripts/src/rofi/specific_code_project.sh ~/code/ember-data-processing
+
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a
@@ -69,6 +72,8 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 # NOTE: Rofi
 bindsym $mod+space exec --no-startup-id rofi -show drun
 bindsym $mod+Tab exec --no-startup-id rofi -show window
+bindsym $mod+c exec --no-startup-id ~/dotfiles/scripts/src/rofi/code_project.sh
+
 
 # NOTE: Navigation and layout
     # Move your focus around
