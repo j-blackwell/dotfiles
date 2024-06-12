@@ -30,6 +30,14 @@ cd ~
 git clone git@github.com:jrstats/dotfiles.git
 cd dotfiles
 stow --adopt .
+stow --adopt nvim
+stow --adopt polybar
+stow --adopt rofi
+stow --adopt alacritty
+stow --adopt flameshot
+stow --adopt i3
+stow --adopt tmux
+stow --adopt dunst
 
 # backups
 sudo pacman -S timeshift

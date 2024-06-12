@@ -104,6 +104,24 @@ pacman -S gdm i3 feh
 systemctl enable gdm.service
 ```
 
+## Notifications
+
+Install and configure a notification deamon.
+
+``` sh
+sudo pacman -S dunst
+```
+
+Add the configuration to the D-Bus services `/usr/share/dbus-1/services/org.freedesktop.Notifications.service`.
+This will launch the notification server automatically on the first call to it.
+
+``` sh
+[D-BUS Service]
+Name=org.freedesktop.Notifications
+Exec=/usr/bin/dunst
+```
+
+
 ## SSH
 
 Allow ssh over the network.
