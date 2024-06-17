@@ -12,7 +12,9 @@ menu(){
 	printf "3. Box Lofi\n"
 	printf "4. The Bootleg Boy\n"
 	printf "5. Radio Spinner\n"
-	printf "6. SmoothChill"
+	printf "6. SmoothChill\n"
+	printf "7. BBC Radio 1\n"
+	printf "8. BBC Radio 2\n"
 }
 
 main() {
@@ -49,6 +51,17 @@ main() {
 				mpv "https://media-ssl.musicradio.com/SmoothChill"
 			break
 			;;
+		7)
+			notification ;
+				mpv "http://lstn.lv/bbc.m3u8?station=bbc_radio_one&bitrate=320000"
+			break
+			;;
+		8)
+			notification ;
+				mpv "http://lstn.lv/bbc.m3u8?station=bbc_radio_two&bitrate=320000"
+			break
+			;;
+
 	esac
 }
 
