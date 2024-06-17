@@ -11,5 +11,5 @@ if [[ -z "${CODE_PROJECT}" ]]; then
     echo "Cancel"
 else
     DIRECTORY=$(basename "${CODE_PROJECTS}")
-    rofi-sensible-terminal -e tmux new-session -A -s $CODE_PROJECT "cd $CODE_PROJECT && nvim ." &
+    rofi-sensible-terminal -e tmux new-session -A -s $CODE_PROJECT "cd $CODE_PROJECT && source ~/.bashrc && /opt/nvim-linux64/bin/nvim .; bash" &
 fi
