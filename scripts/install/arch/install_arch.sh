@@ -57,9 +57,10 @@ sudo systemctl --user enable pulseaudio
 sudo pacman -S rofi polybar
 
 # apps
-sudo pacman -S firefox flameshot lazygit nautilus neovim steam tmux
+sudo pacman -S firefox flameshot lazygit nautilus neovim tmux
 yay -S ytmdesktop-bin
 
 # work
 sudo pacman -S docker mysql-workbench r
 yay -S google-chrome dropbox duckdb-bin google-cloud-cli slack-desktop
+
