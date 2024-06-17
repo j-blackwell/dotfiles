@@ -1,5 +1,5 @@
 # utils
-sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep amd-ucode jq
+sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep amd-ucode jq fd
 
 sudo systemctl enable reflector.service && sudo systemctl start reflector.service
 sudo systemctl enable fstrim.timer
@@ -49,7 +49,7 @@ sudo systemctl enable bluetooth.service && sudo systemctl start bluetooth.servic
 yay -S bluetui
 
 # sound
-sudo pacman -S pulseaudio lib32-libpulse lib32-alsa-plugins
+sudo pacman -S pulseaudio lib32-libpulse lib32-alsa-plugins mpv
 sudo systemctl --user enable dbus
 sudo systemctl --user enable pulseaudio
 

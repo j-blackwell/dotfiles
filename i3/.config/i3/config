@@ -73,6 +73,8 @@ bindsym $mod+d exec ~/dotfiles/scripts/src/rofi/specific_code_project.sh ~/code/
 bindsym $mod+space exec --no-startup-id rofi -show drun
 bindsym $mod+Tab exec --no-startup-id rofi -show window
 bindsym $mod+c exec --no-startup-id ~/dotfiles/scripts/src/rofi/code_project.sh
+bindsym $mod+b exec --no-startup-id ~/dotfiles/scripts/src/rofi/rofi-beats.sh
+
 
 
 # NOTE: Navigation and layout
