@@ -1,5 +1,6 @@
 return {
 	"linux-cultist/venv-selector.nvim",
+	branch = "regexp",
 	cmd = "VenvSelect",
 	opts = function(_, opts)
 		return vim.tbl_deep_extend("force", opts, {

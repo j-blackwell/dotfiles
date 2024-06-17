@@ -131,3 +131,43 @@ sudo pacman -S openssh
 systemctl start sshd.service && systemctl enable sshd.service
 ip -br a | grep UP # grab the <ip_address> of form 192.168.x.x
 ```
+
+
+## Steam
+
+### 32-Bit drivers
+
+Make sure to instal the 32-bit OpenGL graphics driver:
+
+``` sh
+sudo pacman -S lib32-mesa mesa
+```
+
+### Desktop portal
+
+A desktop portal is required in order to open file choosers within Steam.
+
+``` sh
+sudo pacman -S xdg-desktop-portal
+```
+
+### Font
+
+Steam uses Arial. Install an alternative.
+
+``` sh
+sudo pacman -S ttf-liberation
+```
+
+### Locale
+
+Steam uses the `en_US.UTF-8` locale, so this is needed.
+Head to `/etc/locale.gen` and uncomment this line.
+Then run `locale-gen`.
+
+
+### Install
+
+``` sh
+sudo pacman -S steam
+```
