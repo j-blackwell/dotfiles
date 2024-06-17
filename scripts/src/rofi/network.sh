@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+#
+# https://github.com/sineto/nmcli-rofi/blob/master/nmcli-rofi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # default config

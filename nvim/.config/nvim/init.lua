@@ -828,6 +828,35 @@ require("lazy").setup({
 		event = "VimEnter",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = { signs = false },
+		keys = {
+			{ "<leader>sta", "<CMD>TodoTelescope<CR>", mode = "n", desc = "[S]earch [t]odo [a]ll" },
+			{ "<leader>stt", "<CMD>TodoTelescope keywords=TODO<CR>", mode = "n", desc = "[S]earch [t]odo [T]ODOs" },
+			{
+				"<leader>stn",
+				"<CMD>TodoTelescope keywords=NOTE,INFO<CR>",
+				mode = "n",
+				desc = "[S]earch [t]odo [N]OTEs",
+			},
+			{
+				"<leader>stf",
+				"<CMD>TodoTelescope keywords=FIX,FIXME,BUG,FIXIT,ISSUE<CR>",
+				mode = "n",
+				desc = "[S]earch [t]odo [F]IXs",
+			},
+			{
+				"<leader>stw",
+				"<CMD>TodoTelescope keywords=WARN,WARNING,XXX<CR>",
+				mode = "n",
+				desc = "[S]earch [t]odo [W]ARNs",
+			},
+			{
+				"<leader>stp",
+				"<CMD>TodoTelescope keywords=PERF,OPTIM,PERFORMANCE,OPTIMIZE<CR>",
+				mode = "n",
+				desc = "[S]earch [t]odo [P]ERFs",
+			},
+			{ "<leader>sth", "<CMD>TodoTelescope keywords=HACK<CR>", mode = "n", desc = "[S]earch [t]odo [H]ACKs" },
+		},
 	},
 
 	{ -- Collection of various small independent plugins/modules
