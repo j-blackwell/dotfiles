@@ -62,7 +62,7 @@ pactl set-default-sink alsa_output.pci-0000_26_00.1.hdmi-stereo-extra4
 sudo pacman -S rofi polybar
 
 # apps
-sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp
+sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp obsidian
 yay -S ytmdesktop-bin
 
 # work
