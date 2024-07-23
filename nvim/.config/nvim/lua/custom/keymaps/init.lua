@@ -12,10 +12,11 @@ return {
 		":e ./playground/",
 		{ desc = "Create a new buffer with a new file in the playground folder" }
 	),
-	map("n", "<Leader>d%", ":call delete(@%)<CR>:bp<bar>bd#<CR>", { desc = "Delete the file of the current buffer" }),
+	map("n", "<Leader>d%", ":call delete(@%)<CR>:bp<bar>bd#<CR>", { desc = "[D]elete the file of the current buffer" }),
+	map("n", "<Leader>bd", "<CMD>bd<CR>", { desc = "[B]uffer [d]elete" }),
+	map("n", "<Leader>ba", "<CMD>bufdo bwipeout<CR>", { desc = "[B]uffer delete [a]ll" }),
 	map("n", "<Leader>cL", ":LspStop<CR>:LspStart<CR>", { desc = "Restart the [L]SP" }),
 	map("n", "<Leader>ll", ":Lazy<CR>", { desc = "Load [L]azy" }),
-	map("n", "<Leader>bd", "<CMD>bd<CR>", { desc = "[D]elete buffer" }),
 	map("n", "<S-h>", "<CMD>bprev<CR>", { desc = "Switch to previous buffer" }),
 	map("n", "<S-l>", "<CMD>bnext<CR>", { desc = "Switch to next buffer" }),
 	map("v", "<Leader>d", "yP", { desc = "[d]uplicate selection" }),
