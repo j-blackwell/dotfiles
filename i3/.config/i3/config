@@ -80,6 +80,7 @@ bindsym $mod+c exec --no-startup-id ~/dotfiles/scripts/src/rofi/code_project.sh
 bindsym $mod+b exec --no-startup-id ~/dotfiles/scripts/src/rofi/rofi-beats.sh
 bindsym $mod+n exec --no-startup-id ~/dotfiles/scripts/src/rofi/network.sh
 bindsym $mod+Escape exec --no-startup-id rofi -show powermenu -modi powermenu:~/dotfiles/scripts/src/rofi/power.sh
+bindsym $mod+: exec --no-startup-id rofi -mode emoji -show emoji
 
 
 # NOTE: Navigation and layout

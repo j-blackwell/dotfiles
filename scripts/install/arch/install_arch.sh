@@ -59,7 +59,7 @@ sudo systemctl --user enable pulseaudio
 pactl set-default-sink alsa_output.pci-0000_26_00.1.hdmi-stereo-extra4
 
 # desktop
-sudo pacman -S rofi polybar
+sudo pacman -S rofi polybar rofi-emoji
 
 # apps
 sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp obsidian
