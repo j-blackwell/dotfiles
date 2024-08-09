@@ -18,7 +18,7 @@ systemctl --user start xdg-desktop-portal-wlr.service
 sudo pacman -S upower
 
 # programming
-sudo pacman -S npm python3 python-pip python-virtualenv rust pyenv
+sudo pacman -S npm python3 python-pip python-virtualenv rust pyenv helm
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(pyenv init -)"' >> ~/.bashrc

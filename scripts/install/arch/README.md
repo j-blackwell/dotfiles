@@ -171,3 +171,10 @@ Then run `locale-gen`.
 ``` sh
 sudo pacman -S steam
 ```
+
+### Time sync
+Setup sync with the Network Time Protocol (ntp)
+
+```sh
+sudo systemctl enable --now systemd-timesyncd
+```
