@@ -21,4 +21,6 @@ return {
 	map("n", "<S-l>", "<CMD>bnext<CR>", { desc = "Switch to next buffer" }),
 	map("v", "<Leader>d", "yP", { desc = "[d]uplicate selection" }),
 	map("n", "vag", "ggVG", { desc = "Entire file" }),
+	map("n", "<Leader>rr", "diwcf=return <Esc>", { desc = "Replace assignment with return" }),
+	map("n", "<Leader>ra", "ciw=<Esc>i", { desc = "Replace return with assignment" }),
 }
