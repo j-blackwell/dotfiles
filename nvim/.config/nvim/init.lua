@@ -729,6 +729,9 @@ require("lazy").setup({
 			--  into multiple repos for maintenance purposes.
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-nvim-lsp-signature-help",
+			"hrsh7th/cmp-nvim-lsp-document-symbol",
 		},
 		config = function()
 			-- See `:help cmp`
@@ -793,6 +796,17 @@ require("lazy").setup({
 						end
 					end, { "i", "s" }),
 
+					-- Trigger signature help
+					["<C-k>"] = cmp.mapping(function()
+						cmp.complete({
+							config = {
+								sources = {
+									{ name = "nvim_lsp_signature_help" },
+								},
+							},
+						})
+					end, { "i", "s" }),
+
 					-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
 					--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
 				}),
@@ -800,7 +814,20 @@ require("lazy").setup({
 					{ name = "nvim_lsp" },
 					{ name = "luasnip" },
 					{ name = "path" },
+					{ name = "nvim_lsp_signature_help" },
+					{
+						name = "buffer",
+						option = {
+							get_bufnrs = function()
+								return vim.api.nvim_list_bufs()
+							end,
+						},
+					},
 				},
+			})
+
+			cmp.setup.cmdline("/", {
+				sources = cmp.config.sources({ { name = "nvim_lsp_document_symbol" } }, { { name = "buffer" } }),
 			})
 		end,
 	},
