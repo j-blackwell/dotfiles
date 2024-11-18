@@ -62,7 +62,8 @@ return {
 			function()
 				require("telescope.builtin").find_files({
 					prompt_title = "Search for nvim swap files",
-					cwd = string.format("~/.local/share/nvim/swap"),
+					cwd = string.format("~/.local/state/nvim/swap"),
+					find_command = { "rg", "--files", "--hidden", "--glob", ".*", "--glob", "**/.config/**" },
 					file_ignore_patterns = {},
 					no_ignore = true,
 				})

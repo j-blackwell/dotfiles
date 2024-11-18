@@ -6,7 +6,7 @@ Losely based off the [General recommendations](https://wiki.archlinux.org/title/
 ## Terminal tools
 
 ``` sh
-pacman -S vim alacritty man git
+pacman -S vim man git
 ```
 
 ## Users
@@ -97,11 +97,24 @@ pacman -Syu
 
 ## Graphics
 
-Setup xorg, gdm (login and display manager) and i3.
+Pick either wayland + hyprland or xorg and i3.
+
+### Xorg
 
 ``` sh
-pacman -S gdm i3 feh
+pacman -S gdm i3 feh alacritty
+sudo pacman -S xdg-desktop-portal xdg-desktop-portal-wlr
+systemctl --user start xdg-desktop-portal-wlr.service
 systemctl enable gdm.service
+```
+
+### Wayland
+
+``` sh
+pacman kitty
+pacman -S gdm hyprland
+systemctl enable gdm.service
+pacman -S wofi waybar
 ```
 
 ## Notifications

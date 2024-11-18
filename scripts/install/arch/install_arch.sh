@@ -68,6 +68,6 @@ sudo systemctl enable syncthing@$USER.service
 sudo systemctl start syncthing@$USER.service
 
 # work
-sudo pacman -S docker mysql-workbench r libreoffice-fresh
+sudo pacman -S docker docker-buildx mysql-workbench r libreoffice-fresh
 yay -S google-chrome dropbox duckdb-bin google-cloud-cli slack-desktop dropbox-cli
 
