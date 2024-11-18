@@ -23,4 +23,7 @@ return {
 	map("n", "vag", "ggVG", { desc = "Entire file" }),
 	map("n", "<Leader>rr", "diwcf=return <Esc>", { desc = "Replace assignment with return" }),
 	map("n", "<Leader>ra", "ciw=<Esc>i", { desc = "Replace return with assignment" }),
+	map("n", "<Leader>rd", "^sd\"f:r=", { desc = "Replace dictionary entry with assignment" }),
 }
+
+
