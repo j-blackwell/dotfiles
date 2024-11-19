@@ -2,6 +2,7 @@ local function map(mode, lhs, rhs, opts)
 	vim.keymap.set(mode, lhs, rhs, opts or {})
 end
 
+
 return {
 	map("n", "Q", "@qj", { desc = "Apply the 'q' macro and move to the next line" }),
 	map("n", "J", "Vj", { desc = "Select next line in visual block mode" }),
@@ -24,6 +25,5 @@ return {
 	map("n", "<Leader>rr", "diwcf=return <Esc>", { desc = "Replace assignment with return" }),
 	map("n", "<Leader>ra", "ciw=<Esc>i", { desc = "Replace return with assignment" }),
 	map("n", "<Leader>rd", "^sd\"f:r=", { desc = "Replace dictionary entry with assignment" }),
+	map("i", "<C-u>", "", { desc = "Remove ctrl+u" }),
 }
-
-
