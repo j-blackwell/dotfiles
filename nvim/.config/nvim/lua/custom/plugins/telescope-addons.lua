@@ -70,5 +70,17 @@ return {
 			end,
 			desc = "[F]ind nvim [s]wap files",
 		},
+		{
+			"<leader>fa",
+			function()
+				require("telescope.builtin").find_files({
+					prompt_title = "Search for github actions files",
+					cwd = string.format("%s/.github", vim.fn.getcwd()),
+					file_ignore_patterns = {},
+					no_ignore = true,
+				})
+			end,
+			desc = "[F]ind github [a]ction files",
+		},
 	},
 }
