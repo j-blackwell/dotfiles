@@ -115,31 +115,43 @@ if ! shopt -oq posix; then
 	fi
 fi
 
-alias venv="source ~/code/bash/local/venv.sh"
-alias unpickle="python3 ~/code/bash/local/unpickle.py"
 export GOOGLE_APPLICATION_CREDENTIALS='/home/jamesr/.config/gcloud/legacy_credentials/james@ember-climate.org/adc.json'
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-	eval "$(pyenv init -)"
-fi
-eval "$(pyenv virtualenv-init -)"
-
-export PATH="$PATH:/opt/nvim-linux64/bin"
-
-alias nv-dagster="cd ~/code/ember-data-processing/ && nvim ."
-alias nv-api="cd ~/code/ember-api/ && nvim ."
-alias nv-config="cd ~/.config/nvim/ && nvim ."
-alias nv-dotfiles="cd ~/dotfiles/ && nvim ."
-alias nv-bashrc="cd ~ && nvim ~/.bashrc"
-alias nv-bigcon="cd ~/code/local-big-con/ && nvim ."
-alias nv-nv="cd ~/.local/share/nvim/ && nvim ."
-alias nv-notes="cd ~/code/notes && nvim ."
-
+alias duckdb=/opt/duckdb
 . "$HOME/.cargo/env"
 
+##-----------------------------------------------------
+## synth-shell-prompt.sh
+if [ -f /home/james/.config/synth-shell/synth-shell-prompt.sh ] && [ -n "$(echo $- | grep i)" ]; then
+	source /home/james/.config/synth-shell/synth-shell-prompt.sh
+fi
+
+##-----------------------------------------------------
+## better-ls
+if [ -f /home/james/.config/synth-shell/better-ls.sh ] && [ -n "$(echo $- | grep i)" ]; then
+	source /home/james/.config/synth-shell/better-ls.sh
+fi
+
+##-----------------------------------------------------
+## alias
+if [ -f /home/james/.config/synth-shell/alias.sh ] && [ -n "$(echo $- | grep i)" ]; then
+	source /home/james/.config/synth-shell/alias.sh
+fi
+
+##-----------------------------------------------------
+## better-history
+if [ -f /home/james/.config/synth-shell/better-history.sh ] && [ -n "$(echo $- | grep i)" ]; then
+	source /home/james/.config/synth-shell/better-history.sh
+fi
+
+export PATH="$PATH:/opt/nvim-linux64/bin"
 export VISUAL=vim
 export EDITOR=$VISUAL
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
-alias bump="uvx --from 'version-tagger==0.1.7' bump"
+alias bump="uvx --from 'version-tagger@latest' bump"
+alias suvim="sudo vim"
+alias kb="setxkbmap -layout gb"
+alias google-chrome="google-chrome-stable"
+
+# Set up fzf key bindings and fuzzy completion
+eval "$(fzf --bash)"
