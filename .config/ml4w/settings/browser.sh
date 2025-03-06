@@ -1,1 +1,1 @@
-zen
+google-chrome-stable
