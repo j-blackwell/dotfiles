@@ -63,7 +63,7 @@ sudo pacman -S rofi polybar rofi-emoji
 
 # apps
 sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp obsidian syncthing
-yay -S ytmdesktop-bin
+yay -S ytmdesktop-bin noson-app zen-browser-bin
 sudo systemctl enable syncthing@$USER.service
 sudo systemctl start syncthing@$USER.service
 
