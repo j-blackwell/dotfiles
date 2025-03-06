@@ -1,1 +1,1 @@
-flatpak run com.ml4w.sidebar
+uv run ~/dotfiles/scripts/src/rofi/emoji_picker.py
