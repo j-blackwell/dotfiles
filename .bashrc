@@ -148,7 +148,7 @@ export VISUAL=vim
 export EDITOR=$VISUAL
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
-alias bump="uvx --from 'version-tagger>=0.1.12' bump"
+alias bump="uvx --from 'version-tagger@latest' bump"
 alias suvim="sudo vim"
 alias kb="setxkbmap -layout gb"
 alias google-chrome="google-chrome-stable"
