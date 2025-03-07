@@ -14,12 +14,47 @@ return {
 				require("telescope.builtin").find_files({
 					prompt_title = "Search for dotfiles or .config files",
 					cwd = vim.fn.getcwd(),
-					find_command = { "rg", "--files", "--hidden", "--glob", ".*", "--glob", "**/.config/**" },
-					file_ignore_patterns = {},
-					no_ignore = true,
+					find_command = {
+						"rg",
+						"--files",
+						"--hidden",
+						"--no-ignore",
+						"--glob",
+						".*", -- Include dotfiles
+						"--glob",
+						"**/.*/**", -- Include .config directories
+						"--glob",
+						"!.git/*", -- Exclude .git directory
+					},
 				})
 			end,
 			desc = "[F]ind [d]otfiles or .config files",
+		},
+		{
+			"<leader>sG",
+			function()
+				local telescope = require("telescope.builtin")
+				local vimgrep_arguments = { unpack(require("telescope.config").values.vimgrep_arguments) }
+
+				-- Add extra arguments for hidden files & dot directories
+				vim.list_extend(vimgrep_arguments, {
+					"--hidden",
+					"--no-ignore",
+					"--glob",
+					"!.git/*", -- Exclude .git directory
+					"--glob",
+					".*", -- Include dotfiles
+					"--glob",
+					"**/.*/**", -- Include files inside hidden directories
+				})
+
+				telescope.live_grep({
+					prompt_title = "Grep in dotfiles & hidden directories",
+					cwd = vim.fn.getcwd(),
+					vimgrep_arguments = vimgrep_arguments,
+				})
+			end,
+			desc = "[s]earch using [G]rep in dotfiles or .config files",
 		},
 		{
 			"<leader>ft",
