@@ -17,7 +17,7 @@ def emoji_picker():
     emoji_menu = "\n".join(f"{symbol} {name}" for name, symbol in emoji_dict.items())
 
     result = subprocess.run(
-        ["rofi", "-dmenu", "-p", "Pick an emoji"],
+        ["rofi", "-dmenu", "-i", "-p", "Pick an emoji"],
         input=emoji_menu,
         text=True,
         capture_output=True,
