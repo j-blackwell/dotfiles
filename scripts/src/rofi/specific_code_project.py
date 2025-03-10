@@ -34,9 +34,9 @@ def open_project(code_project: str):
             "-A",
             "-s",
             tmux_name,
-            "bash",
+            "zsh",
             "-c",
-            f"cd {code_project} && nvim .; bash",
+            f"cd {code_project} && nvim .; zsh",
         ]
     )
 

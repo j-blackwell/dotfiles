@@ -64,9 +64,9 @@ def main():
             "-A",
             "-s",
             code_project,
-            "bash",
+            "zsh",
             "-c",
-            f"cd {full_path} && nvim .; bash",
+            f"cd {full_path} && nvim .; zsh",
         ]
     )
 
