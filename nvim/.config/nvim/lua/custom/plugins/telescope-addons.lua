@@ -128,6 +128,16 @@ return {
 				end,
 				desc = "[F]ind github [a]ction files",
 			},
+			{
+				"<leader>fD",
+				function()
+					require("telescope.builtin").find_files({
+						prompt_title = "Search for directories to open in oil.nvim",
+						find_command = { "fd", "--type", "d" },
+					})
+				end,
+				desc = "[F]ind [D]irectories",
+			},
 		},
 	},
 	{

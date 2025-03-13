@@ -49,11 +49,26 @@ return {
 				-- You can put your default mappings / updates / etc. in here
 				--  All the info you're looking for is in `:help telescope.setup()`
 				--
-				-- defaults = {
-				--   mappings = {
-				--     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-				--   },
-				-- },
+				defaults = {
+					mappings = {
+						i = {
+							["<CR>"] = function(prompt_bufnr)
+								local actions = require("telescope.actions")
+								local action_state = require("telescope.actions.state")
+								local selection = action_state.get_selected_entry()
+								local path = selection.path or selection[1]
+								if vim.fn.isdirectory(path) == 1 then
+									actions.close(prompt_bufnr) -- Close Telescope before opening Oil
+									vim.schedule(function()
+										require("oil").open(path) -- Open the directory in Oil
+									end)
+								else
+									actions.select_default(prompt_bufnr)
+								end
+							end,
+						},
+					},
+				},
 				-- pickers = {}
 				extensions = {
 					["ui-select"] = {
