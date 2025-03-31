@@ -1,7 +1,8 @@
+require("custom.keymaps.git_checkout")
+
 local function map(mode, lhs, rhs, opts)
 	vim.keymap.set(mode, lhs, rhs, opts or {})
 end
-
 
 return {
 	map("n", "Q", "@qj", { desc = "Apply the 'q' macro and move to the next line" }),
@@ -24,6 +25,7 @@ return {
 	map("n", "vag", "ggVG", { desc = "Entire file" }),
 	map("n", "<Leader>rr", "diwcf=return <Esc>", { desc = "Replace assignment with return" }),
 	map("n", "<Leader>ra", "ciw=<Esc>i", { desc = "Replace return with assignment" }),
-	map("n", "<Leader>rd", "^sd\"f:r=", { desc = "Replace dictionary entry with assignment" }),
+	map("n", "<Leader>rd", '^sd"f:r=', { desc = "Replace dictionary entry with assignment" }),
 	map("i", "<C-u>", "", { desc = "Remove ctrl+u" }),
+	map("n", "<Leader>gc", "<CMD>GitClipboardCheckout<CR>", { desc = "Checkout from clipboard" }),
 }
