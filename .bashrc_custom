@@ -144,9 +144,10 @@ if [ -f /home/james/.config/synth-shell/better-history.sh ] && [ -n "$(echo $- |
 fi
 
 export PATH="$PATH:/opt/nvim-linux64/bin"
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+# export PATH="$PATH:~/.local/bin"
 export VISUAL=vim
 export EDITOR=$VISUAL
-export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 alias bump="uvx --from 'version-tagger@latest' bump"
 alias suvim="sudo vim"
