@@ -1,14 +1,17 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.9"
 # dependencies = []
 # ///
 
 import subprocess
 import time
+import os
 from typing import Optional
 
+STATE_FILE = "/tmp/hypr-monitor-mode.txt"  # Stores the last used mode
 
-# Detect monitors using `hyprctl`
+
+# Detect connected monitors using `hyprctl`
 def get_monitors():
     result = subprocess.run(
         ["hyprctl", "monitors", "all"],
@@ -20,6 +23,7 @@ def get_monitors():
     return monitors
 
 
+# Apply monitor configuration
 def set_monitor_mode(mode, internal, external: Optional[str] = None):
     if mode == "Extend":
         commands = [
@@ -47,36 +51,35 @@ def set_monitor_mode(mode, internal, external: Optional[str] = None):
         subprocess.run(cmd, shell=True)
         time.sleep(0.5)
 
+    # Save the current mode
+    with open(STATE_FILE, "w") as f:
+        f.write(mode)
 
-# Show Rofi menu
-def monitor_picker():
+
+# Cycle through display modes
+def cycle_monitor_modes():
     monitors = get_monitors()
     internal = "eDP-1"
 
-    # If only the internal monitor exists, only show "Laptop Only"
-    if len(monitors) == 1 and internal in monitors:
-        options = ["Laptop Only"]
-        external = None
+    # Detect external monitor
+    external_monitors = [m for m in monitors if m != internal]
+    if len(external_monitors) == 0:
+        return set_monitor_mode("Laptop Only", internal, None)
+
+    external = external_monitors[0]
+    modes = ["Extend", "Laptop Only", "External Only", "Mirror (Duplicate)"]
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, "r") as f:
+            last_mode = f.read().strip()
     else:
-        external_monitors = [m for m in monitors if m != internal]
-        if not external_monitors:
-            external = None
-            options = ["Laptop Only"]
-        else:
-            external = external_monitors[0]
-            options = ["Extend", "Laptop Only", "External Only", "Mirror (Duplicate)"]
+        last_mode = "Laptop Only"
 
-    menu = "\n".join(options)
+    # Get next mode in the cycle
+    next_mode = modes[(modes.index(last_mode) + 1) % len(modes)]
 
-    result = subprocess.run(
-        ["rofi", "-dmenu", "-i", "-p", "Select display mode"],
-        input=menu,
-        text=True,
-        capture_output=True,
-    )
-    selected_mode = result.stdout.strip()
-    set_monitor_mode(selected_mode, internal, external)
+    print(f"Switching to: {next_mode}")
+    set_monitor_mode(next_mode, internal, external)
 
 
 if __name__ == "__main__":
-    monitor_picker()
+    cycle_monitor_modes()

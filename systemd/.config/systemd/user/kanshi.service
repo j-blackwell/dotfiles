@@ -1,0 +1,14 @@
+[Unit]
+Description=Kanshi - Dynamic display configuration daemon
+Documentation=https://sr.ht/~emersion/kanshi
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/kanshi
+Restart=on-failure
+Environment=WAYLAND_DISPLAY=wayland-1
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+
+[Install]
+WantedBy=default.target
+

@@ -1,0 +1,15 @@
+profile undocked {
+    output eDP-1 enable mode 1920x1080 position 0,0
+    exec hyprctl keyword monitor eDP-1,preferred,auto,1
+}
+
+profile mirrored {
+    output eDP-1 enable mode 1920x1080
+    output DP-1 enable mode 1920x1080
+    exec hyprctl keyword monitor eDP-1,preferred,auto,1,mirror,DP-1
+}
+
+profile docked {
+    output eDP-1 enable mode 1920x1080
+    output DP-1 enable mode 1920x1080
+}
