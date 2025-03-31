@@ -20,7 +20,7 @@
       "default": ""
     },
     "persistent-workspaces": {
-            "*": 1
+      "*": 1
     }
   },
 
@@ -43,6 +43,7 @@
 
   // Hyprland Window
   "hyprland/window": {
+    "max-length": 60,
     "rewrite": {
       "(.*) - Brave": "$1",
       "(.*) - Chromium": "$1",
@@ -172,13 +173,17 @@
     "tooltip-format": "Left: Notifications\nRight: Do not disturb",
     "format": "{icon}",
     "format-icons": {
-      "notification": "<span foreground='red'><sup></sup></span>",
+      "notification":
+        "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
       "none": "",
-      "dnd-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-notification":
+        "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
       "dnd-none": "",
-      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "inhibited-notification":
+        "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
       "inhibited-none": "",
-      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-inhibited-notification":
+        "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
       "dnd-inhibited-none": ""
     },
     "return-type": "json",
@@ -234,46 +239,23 @@
     "tooltip": false
   },
 
-  // System
-  "custom/system": {
-    "format": "",
-    "tooltip": false
-  },
 
   // CPU
   "cpu": {
-    "format": "/ C {usage}% ",
+    "format": "CPU ({usage}%)",
     "on-click": "~/.config/ml4w/settings/system-monitor.sh"
   },
 
   // Memory
   "memory": {
-    "format": "/ M {}% ",
-    "on-click": "~/.config/ml4w/settings/system-monitor.sh"
-  },
-
-  // Harddisc space used
-  "disk": {
-    "interval": 30,
-    "format": "D {percentage_used}% ",
-    "path": "/",
+    "format": "MEM ({}%)",
     "on-click": "~/.config/ml4w/settings/system-monitor.sh"
   },
 
   "hyprland/language": {
-    "format": "/ K {short}"
+    "format": "{short}"
   },
 
-  // Group Hardware
-  "group/hardware": {
-    "orientation": "inherit",
-    "drawer": {
-      "transition-duration": 300,
-      "children-class": "not-memory",
-      "transition-left-to-right": false
-    },
-    "modules": ["custom/system", "disk", "cpu", "memory", "hyprland/language"]
-  },
 
   // Group Tools
   "group/tools": {
@@ -295,7 +277,7 @@
   "group/links": {
     "orientation": "horizontal",
     "modules": [
-//      "custom/chatgpt",
+      //"custom/chatgpt",
       "custom/empty"
     ]
   },
