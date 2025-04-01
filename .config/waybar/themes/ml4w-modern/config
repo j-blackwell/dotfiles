@@ -25,6 +25,7 @@
 
     // Modules Left
     "modules-left": [
+        "custom/exit",
         "custom/appmenu",
         "hyprland/workspaces",
         "group/links",
@@ -50,12 +51,11 @@
         "cpu",
         "memory",
         "hyprland/language",
-        "power-profiles-daemon",
-        "group/tools",
+        //"power-profiles-daemon",
+        //"group/tools",
 "tray",
         "custom/notification",
-        "custom/exit",
-        "custom/ml4w-welcome",
+        //"custom/ml4w-welcome",
         "clock"
     ]
 }
