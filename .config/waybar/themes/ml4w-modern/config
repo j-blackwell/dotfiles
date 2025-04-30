@@ -28,6 +28,7 @@
         "custom/exit",
         "custom/appmenu",
         "hyprland/workspaces",
+        "hyprland/window",
         "group/links",
         //"wlr/taskbar",
         //"group/quicklinks",
@@ -36,7 +37,6 @@
 
     // Modules Center
     "modules-center": [
-"hyprland/window",
         "custom/empty"
     ],
 
