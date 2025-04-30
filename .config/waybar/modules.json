@@ -306,8 +306,8 @@
   "network": {
     "format": "{ifname}",
     "interval": 5,
-    "format-wifi": " {essid} ↓{bandwidthDownBits}",
-    "format-ethernet": "  {ifname} ↓{bandwidthDownBits}",
+    "format-wifi": "  ↓{bandwidthDownBits}",
+    "format-ethernet": "   ↓{bandwidthDownBits}",
     "format-disconnected": "Disconnected ⚠",
     "tooltip-format": " {ifname} via {gwaddri}",
     "tooltip-format-wifi": "  {ifname} @ {essid}\nIP: {ipaddr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\nUp: {bandwidthUpBits}\nDown: {bandwidthDownBits}",
