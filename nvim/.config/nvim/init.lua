@@ -333,6 +333,11 @@ require("lazy").setup({
 				-- Disable "format_on_save lsp_fallback" for languages that don't
 				-- have a well standardized coding style. You can add additional
 				-- languages here or re-enable it for the disabled ones.
+				vim.lsp.buf.code_action({
+					context = { only = { "source.organizeImports" } },
+					apply = true,
+				})
+				require("conform").format({ async = true, lsp_fallback = true })
 				local disable_filetypes = { c = true, cpp = true }
 				return {
 					timeout_ms = 500,
