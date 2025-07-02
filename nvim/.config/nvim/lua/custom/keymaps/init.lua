@@ -1,4 +1,5 @@
 require("custom.keymaps.git_checkout")
+require("custom.keymaps.git_copy_url")
 
 local function map(mode, lhs, rhs, opts)
 	vim.keymap.set(mode, lhs, rhs, opts or {})
@@ -29,4 +30,5 @@ return {
 	map("n", "<Leader>rd", '^sd"f:r=', { desc = "Replace dictionary entry with assignment" }),
 	map("i", "<C-u>", "", { desc = "Remove ctrl+u" }),
 	map("n", "<Leader>gc", "<CMD>GitClipboardCheckout<CR>", { desc = "Checkout from clipboard" }),
+	map("n", "<leader>gl", "<CMD>GithubLink<CR>", { desc = "Copy GitHub link to clipboard" }),
 }
