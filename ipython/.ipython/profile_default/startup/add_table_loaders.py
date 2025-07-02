@@ -8,7 +8,7 @@ new_obj = type("", (), {})
 try:
     import polars as pl
 
-    def print_pl(df: pl.DataFrame, tbl_rows=None, tbl_cols=None):
+    def print_pl(df: pl.DataFrame, tbl_rows=None, tbl_cols=-1):
         with pl.Config(tbl_rows=tbl_rows, tbl_cols=tbl_cols):
             print(df)
 except ImportError:
