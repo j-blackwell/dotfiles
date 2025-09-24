@@ -1,5 +1,6 @@
 require("custom.keymaps.git_checkout")
 require("custom.keymaps.git_copy_url")
+require("custom.keymaps.python")
 
 local function map(mode, lhs, rhs, opts)
 	vim.keymap.set(mode, lhs, rhs, opts or {})
@@ -31,4 +32,8 @@ return {
 	map("i", "<C-u>", "", { desc = "Remove ctrl+u" }),
 	map("n", "<Leader>gc", "<CMD>GitClipboardCheckout<CR>", { desc = "Checkout from clipboard" }),
 	map("n", "<leader>gl", "<CMD>GithubLink<CR>", { desc = "Copy GitHub link to clipboard" }),
+	map("n", "<leader>gl", "<CMD>GithubLink<CR>", { desc = "Copy GitHub link to clipboard" }),
+	map("n", "<leader>cip", "<CMD>PythonImportPath<CR>", { desc = "Copy Python import path (with symbol)" }),
+	map("n", "<leader>cim", "<CMD>PythonModulePath<CR>", { desc = "Copy Python module path" }),
+	map("n", "<leader>cis", "<CMD>PythonImportStatement<CR>", { desc = "Copy Python import statement" }),
 }
