@@ -233,7 +233,7 @@
 
   // Clock
   "clock": {
-    "format": "{:%H:%M:%S}",
+    "format": "{:%Y-%m-%d %H:%M:%S}",
     "tooltip-format": "{:%A\n%Y-%m-%d}",
     "interval": 1,
     "on-click": "flatpak run com.ml4w.calendar",
