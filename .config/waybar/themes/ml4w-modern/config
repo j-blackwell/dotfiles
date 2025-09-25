@@ -53,7 +53,7 @@
         "hyprland/language",
         //"power-profiles-daemon",
         //"group/tools",
-"tray",
+        "tray",
         "custom/notification",
         //"custom/ml4w-welcome",
         "clock"
