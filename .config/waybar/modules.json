@@ -88,9 +88,10 @@
     "return-type": "json",
     "exec": "~/.config/ml4w/scripts/updates.sh",
     "interval": 1800,
+    "signal": 1,
+    "hide-empty-text": true,
     "on-click": "~/.config/ml4w/settings/installupdates.sh",
-    "on-click-right": "~/.config/ml4w/settings/software.sh",
-    "min-length": 1,
+    "on-click-right": "~/.config/ml4w/settings/software.sh"
   },
 
   // Wallpaper
@@ -120,13 +121,6 @@
     "format": "",
     "on-click": "~/.config/hypr/scripts/keybindings.sh",
     "tooltip": false
-  },
-
-  // ChatGPT Launcher
-  "custom/chatgpt": {
-    "format": " ",
-    "on-click": "~/.config/ml4w/settings/ai.sh",
-    "tooltip-format": "AI Support"
   },
 
   // Calculator
@@ -233,14 +227,19 @@
 
   // Clock
   "clock": {
-    "format": "{:%H:%M:%S}",
+    "format": "{:%Y-%m-%d %H:%M:%S}",
     "tooltip-format": "{:%A\n%Y-%m-%d}",
-    "interval": 1,
     "on-click": "flatpak run com.ml4w.calendar",
     "timezone": "",
-    "tooltip": true
+    "tooltip": true,
+    "interval": 1,
   },
 
+  // System
+  "custom/system": {
+    "format": "",
+    "tooltip": false
+  },
 
   // CPU
   "cpu": {
@@ -256,11 +255,28 @@
     "min-length": 5,
   },
 
-  "hyprland/language": {
-    "format": "  {short}",
-    "min-length": 4,
+  // Harddisc space used
+  "disk": {
+    "interval": 30,
+    "format": "D {percentage_used}% ",
+    "path": "/",
+    "on-click": "~/.config/ml4w/settings/system-monitor.sh"
   },
 
+  "hyprland/language": {
+    "format": "  {short}",
+  },
+
+  // Group Hardware
+  "group/hardware": {
+    "orientation": "inherit",
+    "drawer": {
+      "transition-duration": 300,
+      "children-class": "not-memory",
+      "transition-left-to-right": false
+    },
+    "modules": ["custom/system", "disk", "cpu", "memory", "hyprland/language"]
+  },
 
   // Group Tools
   "group/tools": {
@@ -282,7 +298,7 @@
   "group/links": {
     "orientation": "horizontal",
     "modules": [
-      //"custom/chatgpt",
+      "custom/chatgpt",
       "custom/empty"
     ]
   },
@@ -332,8 +348,7 @@
     "format-alt": "{icon}  {time}",
     // "format-good": "", // An empty format will hide the module
     // "format-full": "",
-    "format-icons": [" ", " ", " ", " ", " "],
-    "min-length": 6,
+    "format-icons": [" ", " ", " ", " ", " "]
   },
 
   // Power Profiles Daemon
@@ -352,7 +367,7 @@
   // Pulseaudio
   "pulseaudio": {
     // "scroll-step": 1, // %, can be a float
-    "format": "{icon}  {volume}%",
+    "format": "{icon}   {volume}%",
     "format-bluetooth": "{volume}% {icon} {format_source}",
     "format-bluetooth-muted": " {icon} {format_source}",
     "format-muted": " {format_source}",
@@ -367,17 +382,15 @@
       "car": " ",
       "default": ["", "", ""]
     },
-    "on-click": "pavucontrol",
-    "min-length": 6,
+    "on-click": "pavucontrol"
   },
 
-  // Bluetooth
   "bluetooth": {
     "format": "",
     "format-connected": " ",
     "format-disconnected": " ",
-    "format-disabled": "",
-    "format-off": "",
+    "format-disabled": "",
+    "format-off": "",
     "format-no-controller": "",
     "interval": 30,
     "on-click": "blueman-manager",
@@ -385,7 +398,6 @@
     "tooltip-format": "{device_alias}",
     "min-length": 3,
   },
-
 
   // Other
   "user": {

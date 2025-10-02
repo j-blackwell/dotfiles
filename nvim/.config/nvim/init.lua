@@ -317,10 +317,10 @@ require("lazy").setup({
 			{
 				"<leader>cf",
 				function()
-					vim.lsp.buf.code_action({
-						context = { only = { "source.organizeImports" } },
-						apply = true,
-					})
+					-- vim.lsp.buf.code_action({
+					-- 	context = { only = { "source.organizeImports" } },
+					-- 	apply = true,
+					-- })
 					require("conform").format({ async = true, lsp_fallback = true })
 				end,
 				mode = "",
@@ -333,10 +333,11 @@ require("lazy").setup({
 				-- Disable "format_on_save lsp_fallback" for languages that don't
 				-- have a well standardized coding style. You can add additional
 				-- languages here or re-enable it for the disabled ones.
-				vim.lsp.buf.code_action({
-					context = { only = { "source.organizeImports" } },
-					apply = true,
-				})
+				-- vim.lsp.buf.code_action({
+				-- 	context = { only = { "source.organizeImports" } },
+				-- 	apply = true,
+				-- })
+				require("conform").formatters.ruff_format = { append_args = { "--line-length", "100" } }
 				require("conform").format({ async = true, lsp_fallback = true })
 				local disable_filetypes = { c = true, cpp = true }
 				return {
@@ -348,7 +349,12 @@ require("lazy").setup({
 				lua = { "stylua" },
 				md = { "prettier" },
 				-- Conform can also run multiple formatters sequentially
-				python = { "ruff_format" },
+				python = {
+					-- To organize the imports.
+					"ruff_organize_imports",
+					-- To run the Ruff formatter.
+					"ruff_format",
+				},
 				--
 				-- You can use a sub-list to tell conform to run *until* a formatter
 				-- is found.

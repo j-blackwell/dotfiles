@@ -82,7 +82,7 @@
         "group/tools",
         "custom/exit",
         "clock",
-"tray",
+        "tray",
         "custom/notification",
         "custom/ml4w-welcome"
     ]
