@@ -26,6 +26,14 @@ return {
 			-- See the full "keymap" documentation for information on defining your own keymap.
 			keymap = { preset = "default" },
 
+			completion = {
+				accept = {
+					auto_brackets = {
+						enabled = false,
+					},
+				},
+			},
+
 			appearance = {
 				-- Sets the fallback highlight groups to nvim-cmp's highlight groups
 				-- Useful for when your theme doesn't support blink.cmp
