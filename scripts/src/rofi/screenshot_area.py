@@ -6,7 +6,6 @@
 
 import subprocess
 
-
 if __name__ == "__main__":
-    command = 'grim -g "$(slurp)" - | swappy -f -'
+    command = 'grim -g "$(slurp)" - | tee >(wl-copy) | swappy -f -'
     subprocess.run(["bash", "-c", command])
