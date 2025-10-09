@@ -1,3 +1,4 @@
 .env
 Session.vim
 history.sqlite
+.config/ml4w/cache/
