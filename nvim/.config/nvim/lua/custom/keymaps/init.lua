@@ -1,6 +1,7 @@
 require("custom.keymaps.git_checkout")
 require("custom.keymaps.git_copy_url")
 require("custom.keymaps.python")
+require("custom.keymaps.dagster")
 
 local function map(mode, lhs, rhs, opts)
 	vim.keymap.set(mode, lhs, rhs, opts or {})
@@ -36,4 +37,5 @@ return {
 	map("n", "<leader>cip", "<CMD>PythonImportPath<CR>", { desc = "Copy Python import path (with symbol)" }),
 	map("n", "<leader>cim", "<CMD>PythonModulePath<CR>", { desc = "Copy Python module path" }),
 	map("n", "<leader>cis", "<CMD>PythonImportStatement<CR>", { desc = "Copy Python import statement" }),
+	map("n", "<leader>cda", "<CMD>DagsterGoToAsset<CR>", { desc = "Go-to search of current asset" }),
 }
