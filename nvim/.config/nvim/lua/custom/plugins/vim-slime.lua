@@ -2,6 +2,7 @@ local delimiter = "^# %%"
 return {
 	{
 		"jpalardy/vim-slime",
+		ft = { "python" },
 		config = function()
 			vim.g.slime_cell_delimiter = delimiter
 			vim.g.slime_target = "tmux"
