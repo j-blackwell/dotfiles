@@ -36,7 +36,8 @@ return {
 	map("n", "<leader>gl", "<CMD>GithubLink<CR>", { desc = "Copy GitHub link to clipboard" }),
 	map("n", "<leader>cip", "<CMD>PythonImportPath<CR>", { desc = "Copy Python import path (with symbol)" }),
 	map("n", "<leader>cim", "<CMD>PythonModulePath<CR>", { desc = "Copy Python module path" }),
-	map("n", "<leader>cis", "<CMD>PythonImportStatement<CR>", { desc = "Copy Python import statement" }),
+	map("n", "<leader>cii", "<CMD>PythonImportStatement<CR>", { desc = "Copy Python import statement" }),
+	map("n", "<leader>cis", "<CMD>PythonSlimeSendImportStatement<CR>", { desc = "Slime send python import statement" }),
 	map("n", "<leader>cda", "<CMD>DagsterGoToAsset<CR>", { desc = "Go-to search of current asset" }),
 	map("n", "<leader>cdp", "<CMD>DagsterGoToAssetProd<CR>", { desc = "Go-to search of current asset in PROD." }),
 }

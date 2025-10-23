@@ -122,7 +122,7 @@ local function copy_module_path()
 end
 
 -- Generate import statement
-local function copy_import_statement()
+local function get_import_statement()
 	local current_file = vim.fn.expand("%:p")
 
 	if not current_file:match("%.py$") then
@@ -140,13 +140,23 @@ local function copy_import_statement()
 	else
 		import_statement = "import " .. base_import
 	end
+	return import_statement
+end
 
+local function copy_import_statement()
+	local import_statement = get_import_statement()
 	vim.fn.setreg("+", import_statement)
 	vim.fn.setreg('"', import_statement)
 	vim.notify("Copied import statement: " .. import_statement, vim.log.levels.INFO)
 end
 
+local function slime_send_import_statement()
+	local import_statement = get_import_statement()
+	vim.fn["slime#send"](import_statement .. "\r")
+end
+
 vim.api.nvim_create_user_command("PythonImportStatement", copy_import_statement, {})
 vim.api.nvim_create_user_command("PythonImportPath", copy_import_path, {})
 vim.api.nvim_create_user_command("PythonModulePath", copy_module_path, {})
+vim.api.nvim_create_user_command("PythonSlimeSendImportStatement", slime_send_import_statement, {})
 return {}
