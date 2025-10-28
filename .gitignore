@@ -1,4 +1,5 @@
 .env
 Session.vim
 history.sqlite
-.config/ml4w/cache/
+.config/ml4w/cache
+ipython/.ipython/profile_default/history*sqlite
