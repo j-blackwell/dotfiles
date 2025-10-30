@@ -24,6 +24,9 @@ return {
 			{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
 		},
 		config = function()
+			local telescope = require("telescope")
+			local actions = require("telescope.actions")
+			local action_state = require("telescope.actions.state")
 			-- Telescope is a fuzzy finder that comes with a lot of different things that
 			-- it can fuzzy find! It's more than just a "file finder", it can search
 			-- many different aspects of Neovim, your workspace, LSP, and more!
@@ -53,8 +56,6 @@ return {
 					mappings = {
 						i = {
 							["<CR>"] = function(prompt_bufnr)
-								local actions = require("telescope.actions")
-								local action_state = require("telescope.actions.state")
 								local selection = action_state.get_selected_entry()
 								local path = selection.path or selection[1]
 								if vim.fn.isdirectory(path) == 1 then
@@ -64,6 +65,48 @@ return {
 									end)
 								else
 									actions.select_default(prompt_bufnr)
+								end
+							end,
+							["<C-d>"] = function(prompt_bufnr)
+								local selection = action_state.get_selected_entry()
+								if selection then
+									local bufnr = vim.fn.bufnr(selection.value)
+									if bufnr ~= -1 then
+										vim.api.nvim_buf_delete(bufnr, { force = true })
+									end
+								end
+								-- Refresh the picker
+								actions.close(prompt_bufnr)
+								require("telescope.builtin").buffers()
+							end,
+							["<C-y>"] = function(prompt_bufnr)
+								local selection = action_state.get_selected_entry()
+								if selection then
+									local full_path = vim.fn.fnamemodify(selection.value, ":p")
+									vim.fn.setreg("+", full_path)
+									print("Copied: " .. full_path)
+								end
+							end,
+						},
+						n = {
+							["d"] = function(prompt_bufnr)
+								local selection = action_state.get_selected_entry()
+								if selection then
+									local bufnr = vim.fn.bufnr(selection.value)
+									if bufnr ~= -1 then
+										vim.api.nvim_buf_delete(bufnr, { force = true })
+									end
+								end
+								-- Refresh the picker
+								actions.close(prompt_bufnr)
+								require("telescope.builtin").buffers()
+							end,
+							["y"] = function(prompt_bufnr)
+								local selection = action_state.get_selected_entry()
+								if selection then
+									local full_path = vim.fn.fnamemodify(selection.value, ":p")
+									vim.fn.setreg("+", full_path)
+									print("Copied: " .. full_path)
 								end
 							end,
 						},
