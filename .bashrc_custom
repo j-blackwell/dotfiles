@@ -153,6 +153,7 @@ alias bump="uvx --from 'version-tagger@latest' bump"
 alias suvim="sudo vim"
 alias kb="setxkbmap -layout gb"
 alias google-chrome="google-chrome-stable"
+alias desktop-files="cd /usr/share/applications/"
 
 # Set up fzf key bindings and fuzzy completion
 eval "$(fzf --bash)"

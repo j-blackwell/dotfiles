@@ -63,9 +63,9 @@ sudo pacman -S rofi polybar rofi-emoji
 
 # apps
 sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp obsidian syncthing github-cli
-yay -S ytmdesktop-bin noson-app zen-browser-bin
-sudo systemctl enable syncthing@$USER.service
-sudo systemctl start syncthing@$USER.service
+yay -S pear-desktop noson-app zen-browser-bin
+# sudo systemctl enable syncthing@$USER.service
+# sudo systemctl start syncthing@$USER.service
 
 # work
 sudo pacman -S docker docker-buildx mysql-workbench r libreoffice-fresh
