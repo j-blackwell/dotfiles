@@ -62,7 +62,7 @@ pactl set-default-sink alsa_output.pci-0000_26_00.1.hdmi-stereo-extra4
 sudo pacman -S rofi polybar rofi-emoji
 
 # apps
-sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp obsidian syncthing
+sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp obsidian syncthing github-cli
 yay -S ytmdesktop-bin noson-app zen-browser-bin
 sudo systemctl enable syncthing@$USER.service
 sudo systemctl start syncthing@$USER.service
