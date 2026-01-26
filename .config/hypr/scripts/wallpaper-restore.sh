@@ -14,11 +14,8 @@
 # Set defaults
 # -----------------------------------------------------
 
-ml4w_cache_folder="$HOME/.cache/ml4w/hyprland-dotfiles"
-
-defaultwallpaper="$HOME/.config/ml4w/wallpapers/default.jpg"
-
-cachefile="$ml4w_cache_folder/current_wallpaper"
+defaultwallpaper="$HOME/wallpaper/default.jpg"
+cachefile="$HOME/.config/ml4w/cache/current_wallpaper"
 
 # -----------------------------------------------------
 # Get current wallpaper
@@ -43,7 +40,4 @@ fi
 # -----------------------------------------------------
 
 echo ":: Setting wallpaper with source image $wallpaper"
-if [ -f ~/.local/bin/waypaper ]; then
-    export PATH=$PATH:~/.local/bin/
-fi
 waypaper --wallpaper "$wallpaper"

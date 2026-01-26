@@ -4,29 +4,16 @@
 # | |/ |/ / _ `/ / / _ \/ _ `/ _ \/ -_) __/
 # |__/|__/\_,_/_/_/ .__/\_,_/ .__/\__/_/   
 #                /_/       /_/             
-
-# Source library.sh
-source $HOME/.config/ml4w/library.sh
-
 # -----------------------------------------------------
 # Check to use wallpaper cache
 # -----------------------------------------------------
 
 if [ -f ~/.config/ml4w/settings/wallpaper_cache ]; then
     use_cache=1
-    _writeLog "Using Wallpaper Cache"
+    echo ":: Using Wallpaper Cache"
 else
     use_cache=0
-    _writeLog "Wallpaper Cache disabled"
-fi
-
-# -----------------------------------------------------
-# Create cache folder
-# -----------------------------------------------------
-ml4w_cache_folder="$HOME/.cache/ml4w/hyprland-dotfiles"
-
-if [ ! -d $ml4w_cache_folder ]; then
-    mkdir -p $ml4w_cache_folder
+    echo ":: Wallpaper Cache disabled"
 fi
 
 # -----------------------------------------------------
@@ -34,29 +21,28 @@ fi
 # -----------------------------------------------------
 
 force_generate=0
+generatedversions="$HOME/.config/ml4w/cache/wallpaper-generated"
+waypaperrunning=$HOME/.config/ml4w/cache/waypaper-running
+cachefile="$HOME/.config/ml4w/cache/current_wallpaper"
+blurredwallpaper="$HOME/.config/ml4w/cache/blurred_wallpaper.png"
+squarewallpaper="$HOME/.config/ml4w/cache/square_wallpaper.png"
+rasifile="$HOME/.config/ml4w/cache/current_wallpaper.rasi"
+blurfile="$HOME/.config/ml4w/settings/blur.sh"
+defaultwallpaper="$HOME/wallpaper/default.jpg"
+wallpapereffect="$HOME/.config/ml4w/settings/wallpaper-effect.sh"
+blur="50x30"
+blur=$(cat $blurfile)
 
-# Cache for generated wallpapers with effects
-generatedversions="$ml4w_cache_folder/wallpaper-generated"
-if [ ! -d $generatedversions ]; then
-    mkdir -p $generatedversions
-fi
-
-# Will be set when waypaper is running
-waypaperrunning=$ml4w_cache_folder/waypaper-running
+# Ensures that the script only run once if wallpaper effect enabled
 if [ -f $waypaperrunning ]; then
     rm $waypaperrunning
     exit
 fi
 
-cachefile="$ml4w_cache_folder/current_wallpaper"
-blurredwallpaper="$ml4w_cache_folder/blurred_wallpaper.png"
-squarewallpaper="$ml4w_cache_folder/square_wallpaper.png"
-rasifile="$ml4w_cache_folder/current_wallpaper.rasi"
-blurfile="$HOME/.config/ml4w/settings/blur.sh"
-defaultwallpaper="$HOME/.config/ml4w/wallpapers/default.jpg"
-wallpapereffect="$HOME/.config/ml4w/settings/wallpaper-effect.sh"
-blur="50x30"
-blur=$(cat $blurfile)
+# Create folder with generated versions of wallpaper if not exists
+if [ ! -d $generatedversions ]; then
+    mkdir $generatedversions
+fi
 
 # -----------------------------------------------------
 # Get selected wallpaper
@@ -72,7 +58,7 @@ else
     wallpaper=$1
 fi
 used_wallpaper=$wallpaper
-_writeLog "Setting wallpaper with source image $wallpaper"
+echo ":: Setting wallpaper with source image $wallpaper"
 tmpwallpaper=$wallpaper
 
 # -----------------------------------------------------
@@ -82,15 +68,14 @@ tmpwallpaper=$wallpaper
 if [ ! -f $cachefile ]; then
     touch $cachefile
 fi
-echo "$wallpaper" > $cachefile
-_writeLog "Path of current wallpaper copied to $cachefile"
+echo "$wallpaper" >$cachefile
+echo ":: Path of current wallpaper copied to $cachefile"
 
 # -----------------------------------------------------
 # Get wallpaper filename
 # -----------------------------------------------------
-
 wallpaperfilename=$(basename $wallpaper)
-_writeLog "Wallpaper Filename: $wallpaperfilename"
+echo ":: Wallpaper Filename: $wallpaperfilename"
 
 # -----------------------------------------------------
 # Wallpaper Effects
@@ -101,18 +86,18 @@ if [ -f $wallpapereffect ]; then
     if [ ! "$effect" == "off" ]; then
         used_wallpaper=$generatedversions/$effect-$wallpaperfilename
         if [ -f $generatedversions/$effect-$wallpaperfilename ] && [ "$force_generate" == "0" ] && [ "$use_cache" == "1" ]; then
-            _writeLog "Use cached wallpaper $effect-$wallpaperfilename"
+            echo ":: Use cached wallpaper $effect-$wallpaperfilename"
         else
-            _writeLog "Generate new cached wallpaper $effect-$wallpaperfilename with effect $effect"
+            echo ":: Generate new cached wallpaper $effect-$wallpaperfilename with effect $effect"
             notify-send --replace-id=1 "Using wallpaper effect $effect..." "with image $wallpaperfilename" -h int:value:33
             source $HOME/.config/hypr/effects/wallpaper/$effect
         fi
-        _writeLog "Loading wallpaper $generatedversions/$effect-$wallpaperfilename with effect $effect"
-        _writeLog "Setting wallpaper with $used_wallpaper"
+        echo ":: Loading wallpaper $generatedversions/$effect-$wallpaperfilename with effect $effect"
+        echo ":: Setting wallpaper with $used_wallpaper"
         touch $waypaperrunning
         waypaper --wallpaper $used_wallpaper
     else
-        _writeLog "Wallpaper effect is set to off"
+        echo ":: Wallpaper effect is set to off"
     fi
 else
     effect="off"
@@ -122,16 +107,23 @@ fi
 # Execute matugen
 # -----------------------------------------------------
 
-_writeLog "Execute matugen with $used_wallpaper"
-# $HOME/.cargo/bin/matugen image $used_wallpaper
+echo ":: Execute matugen with $used_wallpaper"
 $HOME/.cargo/bin/matugen image $used_wallpaper -m "dark"
 
 # -----------------------------------------------------
 # Execute wallust
 # -----------------------------------------------------
 
-_writeLog "Execute wallust with $used_wallpaper"
+echo ":: Execute wallust with $used_wallpaper"
 $HOME/.cargo/bin/wallust run $used_wallpaper
+
+# -----------------------------------------------------
+# Walcord (NOT SUPPORTED)
+# -----------------------------------------------------
+
+if type walcord >/dev/null 2>&1; then
+    walcord
+fi
 
 # -----------------------------------------------------
 # Reload Waybar
@@ -139,6 +131,7 @@ $HOME/.cargo/bin/wallust run $used_wallpaper
 
 sleep 2
 $HOME/.config/waybar/launch.sh
+# killall -SIGUSR2 waybar
 
 # -----------------------------------------------------
 # Reload nwg-dock-hyprland
@@ -157,7 +150,6 @@ fi
 # -----------------------------------------------------
 # Update SwayNC
 # -----------------------------------------------------
-
 sleep 0.1
 swaync-client -rs
 
@@ -166,16 +158,16 @@ swaync-client -rs
 # -----------------------------------------------------
 
 if [ -f $generatedversions/blur-$blur-$effect-$wallpaperfilename.png ] && [ "$force_generate" == "0" ] && [ "$use_cache" == "1" ]; then
-    _writeLog "Use cached wallpaper blur-$blur-$effect-$wallpaperfilename"
+    echo ":: Use cached wallpaper blur-$blur-$effect-$wallpaperfilename"
 else
-    _writeLog "Generate new cached wallpaper blur-$blur-$effect-$wallpaperfilename with blur $blur"
+    echo ":: Generate new cached wallpaper blur-$blur-$effect-$wallpaperfilename with blur $blur"
     # notify-send --replace-id=1 "Generate new blurred version" "with blur $blur" -h int:value:66
     magick $used_wallpaper -resize 75% $blurredwallpaper
-    _writeLog "Resized to 75%"
+    echo ":: Resized to 75%"
     if [ ! "$blur" == "0x0" ]; then
         magick $blurredwallpaper -blur $blur $blurredwallpaper
         cp $blurredwallpaper $generatedversions/blur-$blur-$effect-$wallpaperfilename.png
-        _writeLog "Blurred"
+        echo ":: Blurred"
     fi
 fi
 cp $generatedversions/blur-$blur-$effect-$wallpaperfilename.png $blurredwallpaper
@@ -193,6 +185,6 @@ echo "* { current-image: url(\"$blurredwallpaper\", height); }" >"$rasifile"
 # Created square wallpaper
 # -----------------------------------------------------
 
-_writeLog "Generate new cached wallpaper square-$wallpaperfilename"
+echo ":: Generate new cached wallpaper square-$wallpaperfilename"
 magick $tmpwallpaper -gravity Center -extent 1:1 $squarewallpaper
 cp $squarewallpaper $generatedversions/square-$wallpaperfilename.png

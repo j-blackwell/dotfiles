@@ -5,19 +5,11 @@
 # |__,__/\_,_/\_, /_.__/\_,_/_/
 #            /___/
 #
-
-# -----------------------------------------------------
-# Prevent duplicate launches: only the first parallel
-# invocation proceeds; all others exit immediately.
-# -----------------------------------------------------
-exec 200>/tmp/waybar-launch.lock
-flock -n 200 || exit 0
-
 # -----------------------------------------------------
 # Quit all running waybar instances
 # -----------------------------------------------------
-killall waybar || true
-pkill waybar || true
+killall waybar
+pkill waybar
 sleep 0.5
 
 # -----------------------------------------------------
@@ -62,7 +54,3 @@ if [ ! -f $HOME/.config/ml4w/settings/waybar-disabled ]; then
 else
     echo ":: Waybar disabled"
 fi
-
-# Explicitly release the lock (optional) -> flock releases on exit
-flock -u 200
-exec 200>&-

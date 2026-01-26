@@ -8,6 +8,17 @@
 
 sleep 1
 
+_isInstalledYay() {
+    package="$1"
+    check="$(yay -Qs --color always "${package}" | grep "local" | grep "\." | grep "${package} ")"
+    if [ -n "${check}" ]; then
+        echo 0 #'0' means 'true' in Bash
+        return #true
+    fi
+    echo 1 #'1' means 'false' in Bash
+    return #false
+}
+
 clear
 figlet -f smslant "Shell"
 
@@ -41,7 +52,7 @@ elif [[ $shell == "zsh" ]]; then
     echo ":: Shell is now zsh."
 
     # Installing oh-my-posh
-    curl -s https://ohmyposh.dev/install.sh | bash -s
+    yay -S oh-my-posh-bin
 
     # Installing oh-my-zsh
     if [ ! -d "$HOME/.oh-my-zsh" ]; then

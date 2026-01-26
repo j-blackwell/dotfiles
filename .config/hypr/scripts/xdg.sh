@@ -10,9 +10,6 @@
 _sleep1="0.1"
 _sleep2="0.5"
 _sleep3="2"
-_sleep4="1"
-
-sleep $_sleep4
 
 # Kill all possible running xdg-desktop-portals
 killall -e xdg-desktop-portal-hyprland
@@ -38,7 +35,7 @@ sleep $_sleep1
 
 # Start xdg-desktop-portal-hyprland
 /usr/lib/xdg-desktop-portal-hyprland &
-sleep $_sleep3
+sleep $_sleep1
 
 # Start xdg-desktop-portal-gtk
 if [ -f /usr/lib/xdg-desktop-portal-gtk ]; then
@@ -58,4 +55,4 @@ systemctl --user start xdg-desktop-portal-hyprland
 
 # Run waybar
 sleep $_sleep3
-# ~/.config/waybar/launch.sh
+~/.config/waybar/launch.sh

@@ -10,8 +10,7 @@
 # -----------------------------------------------------
 sleep 1
 clear
-ml4w_cache_folder="$HOME/.cache/ml4w/hyprland-dotfiles"
-cache_file="$ml4w_cache_folder/current_wallpaper"
+cache_file="$HOME/.config/ml4w/cache/current_wallpaper"
 current_wallpaper=$(cat "$cache_file")
 extension="${current_wallpaper##*.}"
 
