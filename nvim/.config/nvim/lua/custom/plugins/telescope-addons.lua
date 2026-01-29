@@ -146,17 +146,17 @@ return {
 					local finders = require("telescope.finders")
 					local conf = require("telescope.config").values
 
-					-- Pattern that matches any of the decorators
-					local pattern =
-						[['@(dim_asset|intermediate_asset|source_asset|curated_asset|conformed_asset|country_asset|concat_asset|fact_asset|mart_asset|analysis_asset|output_asset|published_asset)\((?:[^()]*|\([^()]*\))*\)\s*def\s+(\w+)']]
+					-- Pattern needs to be properly quoted for shell
+					local decorator_pattern =
+						[['@(dim_asset|intermediate_asset|source_asset|curated_asset|conformed_asset|country_asset|concat_asset|fact_asset|mart_asset|analysis_asset|output_asset|published_asset)\(']]
 
-					local handle = io.popen(
-						"rg --multiline --multiline-dotall --pcre2 --with-filename --line-number --no-heading "
-							.. pattern
-							.. " "
-							.. vim.fn.getcwd()
-							.. " 2>/dev/null"
-					)
+					-- Find all decorator locations
+					local cmd = "rg --pcre2 --with-filename --line-number --no-heading "
+						.. decorator_pattern
+						.. " "
+						.. vim.fn.getcwd()
+
+					local handle = io.popen(cmd)
 					local result = handle:read("*a")
 					handle:close()
 
@@ -166,17 +166,49 @@ return {
 					end
 
 					local entries = {}
+
 					for line in result:gmatch("[^\r\n]+") do
-						local filename, lnum, content = line:match("^([^:]+):(%d+):(.*)$")
-						if filename and lnum and content then
-							local func_name = content:match("def%s+([%w_]+)")
-							if func_name then
-								table.insert(entries, {
-									filename = filename,
-									lnum = tonumber(lnum),
-									col = 1,
-									text = func_name,
-								})
+						local filename, lnum, decorator_match = line:match("^([^:]+):(%d+):.*@([%w_]+)%(")
+
+						if filename and lnum and decorator_match then
+							local start_line = tonumber(lnum)
+
+							-- Scan forward to find the 'def' statement
+							local f = io.open(filename, "r")
+							if f then
+								local current_line_idx = 0
+								local found_def = false
+								local func_name = nil
+								local def_line = nil
+
+								for file_line in f:lines() do
+									current_line_idx = current_line_idx + 1
+
+									-- Start looking from the decorator line
+									if current_line_idx >= start_line and current_line_idx <= start_line + 50 then
+										-- Look for 'def function_name'
+										local match = file_line:match("def%s+([%w_]+)")
+										if match then
+											func_name = match
+											def_line = current_line_idx
+											found_def = true
+											break
+										end
+									elseif current_line_idx > start_line + 50 then
+										break
+									end
+								end
+								f:close()
+
+								if found_def and func_name then
+									table.insert(entries, {
+										filename = filename,
+										lnum = def_line,
+										col = 1,
+										text = func_name,
+										decorator = decorator_match,
+									})
+								end
 							end
 						end
 					end
@@ -194,8 +226,8 @@ return {
 								entry_maker = function(entry)
 									return {
 										value = entry,
-										display = entry.text,
-										ordinal = entry.text,
+										display = entry.decorator .. ": " .. entry.text,
+										ordinal = entry.decorator .. " " .. entry.text,
 										filename = entry.filename,
 										lnum = entry.lnum,
 										col = entry.col,
