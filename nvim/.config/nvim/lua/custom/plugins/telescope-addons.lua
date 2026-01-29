@@ -138,6 +138,76 @@ return {
 				end,
 				desc = "[F]ind [D]irectories",
 			},
+			{
+				"<leader>cds",
+				desc = "[C]ode [D]agster [S]earch",
+				function()
+					local pickers = require("telescope.pickers")
+					local finders = require("telescope.finders")
+					local conf = require("telescope.config").values
+
+					-- Pattern that matches any of the decorators
+					local pattern =
+						[['@(dim_asset|intermediate_asset|source_asset|curated_asset|conformed_asset|country_asset|concat_asset|fact_asset|mart_asset|analysis_asset|output_asset|published_asset)\((?:[^()]*|\([^()]*\))*\)\s*def\s+(\w+)']]
+
+					local handle = io.popen(
+						"rg --multiline --multiline-dotall --pcre2 --with-filename --line-number --no-heading "
+							.. pattern
+							.. " "
+							.. vim.fn.getcwd()
+							.. " 2>/dev/null"
+					)
+					local result = handle:read("*a")
+					handle:close()
+
+					if not result or result == "" then
+						print("No matches found")
+						return
+					end
+
+					local entries = {}
+					for line in result:gmatch("[^\r\n]+") do
+						local filename, lnum, content = line:match("^([^:]+):(%d+):(.*)$")
+						if filename and lnum and content then
+							local func_name = content:match("def%s+([%w_]+)")
+							if func_name then
+								table.insert(entries, {
+									filename = filename,
+									lnum = tonumber(lnum),
+									col = 1,
+									text = func_name,
+								})
+							end
+						end
+					end
+
+					if #entries == 0 then
+						print("No function names extracted")
+						return
+					end
+
+					pickers
+						.new({}, {
+							prompt_title = "Functions under asset decorators",
+							finder = finders.new_table({
+								results = entries,
+								entry_maker = function(entry)
+									return {
+										value = entry,
+										display = entry.text,
+										ordinal = entry.text,
+										filename = entry.filename,
+										lnum = entry.lnum,
+										col = entry.col,
+									}
+								end,
+							}),
+							sorter = conf.generic_sorter({}),
+							previewer = conf.grep_previewer({}),
+						})
+						:find()
+				end,
+			},
 		},
 	},
 	{
