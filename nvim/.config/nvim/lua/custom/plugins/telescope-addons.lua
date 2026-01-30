@@ -139,6 +139,75 @@ return {
 				desc = "[F]ind [D]irectories",
 			},
 			{
+				"<leader>cdr",
+				desc = "[C]ode [D]agster [R]esources",
+				function()
+					local pickers = require("telescope.pickers")
+					local finders = require("telescope.finders")
+					local conf = require("telescope.config").values
+
+					-- Pattern to find classes inheriting from any Resource
+					local resource_pattern = [['class\s+(\w+)\(.*Resource']]
+
+					-- Find all Resource class definitions
+					local cmd = "rg --pcre2 --with-filename --line-number --no-heading --only-matching --replace '$1' "
+						.. resource_pattern
+						.. " "
+						.. vim.fn.getcwd()
+
+					local handle = io.popen(cmd)
+					local result = handle:read("*a")
+					handle:close()
+
+					if not result or result == "" then
+						print("No Resource classes found")
+						return
+					end
+
+					local entries = {}
+
+					for line in result:gmatch("[^\r\n]+") do
+						-- Parse: filename:line_number:class_name
+						local filename, lnum, class_name = line:match("^([^:]+):(%d+):(.+)$")
+
+						if filename and lnum and class_name then
+							table.insert(entries, {
+								filename = filename,
+								lnum = tonumber(lnum),
+								col = 1,
+								text = class_name,
+							})
+						end
+					end
+
+					if #entries == 0 then
+						print("No Resource class names extracted")
+						return
+					end
+
+					pickers
+						.new({}, {
+							prompt_title = "Resource Classes",
+							finder = finders.new_table({
+								results = entries,
+								entry_maker = function(entry)
+									return {
+										value = entry,
+										display = entry.text,
+										ordinal = entry.text,
+										filename = entry.filename,
+										lnum = entry.lnum,
+										col = entry.col,
+									}
+								end,
+							}),
+							sorter = conf.generic_sorter({}),
+							previewer = conf.grep_previewer({}),
+						})
+						:find()
+				end,
+			},
+			{
 				"<leader>cdd",
 				desc = "[C]ode [D]agster [D]efinition",
 				function()
