@@ -138,6 +138,245 @@ return {
 				end,
 				desc = "[F]ind [D]irectories",
 			},
+			{
+				"<leader>cdr",
+				desc = "[C]ode [D]agster [R]esources",
+				function()
+					local pickers = require("telescope.pickers")
+					local finders = require("telescope.finders")
+					local conf = require("telescope.config").values
+
+					-- Pattern to find classes inheriting from any Resource
+					local resource_pattern = [['class\s+(\w+)\(.*Resource']]
+
+					-- Find all Resource class definitions
+					local cmd = "rg --pcre2 --with-filename --line-number --no-heading --only-matching --replace '$1' "
+						.. resource_pattern
+						.. " "
+						.. vim.fn.getcwd()
+
+					local handle = io.popen(cmd)
+					local result = handle:read("*a")
+					handle:close()
+
+					if not result or result == "" then
+						print("No Resource classes found")
+						return
+					end
+
+					local entries = {}
+
+					for line in result:gmatch("[^\r\n]+") do
+						-- Parse: filename:line_number:class_name
+						local filename, lnum, class_name = line:match("^([^:]+):(%d+):(.+)$")
+
+						if filename and lnum and class_name then
+							table.insert(entries, {
+								filename = filename,
+								lnum = tonumber(lnum),
+								col = 1,
+								text = class_name,
+							})
+						end
+					end
+
+					if #entries == 0 then
+						print("No Resource class names extracted")
+						return
+					end
+
+					pickers
+						.new({}, {
+							prompt_title = "Resource Classes",
+							finder = finders.new_table({
+								results = entries,
+								entry_maker = function(entry)
+									return {
+										value = entry,
+										display = entry.text,
+										ordinal = entry.text,
+										filename = entry.filename,
+										lnum = entry.lnum,
+										col = entry.col,
+									}
+								end,
+							}),
+							sorter = conf.generic_sorter({}),
+							previewer = conf.grep_previewer({}),
+						})
+						:find()
+				end,
+			},
+			{
+				"<leader>cdd",
+				desc = "[C]ode [D]agster [D]efinition",
+				function()
+					-- Get the function name under cursor
+					local func_name = vim.fn.expand("<cword>")
+
+					if not func_name or func_name == "" then
+						print("No word under cursor")
+						return
+					end
+
+					local decorator_pattern =
+						[['@(dim_asset|intermediate_asset|source_asset|curated_asset|conformed_asset|country_asset|concat_asset|fact_asset|mart_asset|analysis_asset|output_asset|published_asset)\(']]
+
+					-- Find all decorator locations
+					local cmd = "rg --pcre2 --with-filename --line-number --no-heading "
+						.. decorator_pattern
+						.. " "
+						.. vim.fn.getcwd()
+
+					local handle = io.popen(cmd)
+					local result = handle:read("*a")
+					handle:close()
+
+					if not result or result == "" then
+						print("No decorated functions found")
+						return
+					end
+
+					-- Search for the specific function
+					for line in result:gmatch("[^\r\n]+") do
+						local filename, lnum = line:match("^([^:]+):(%d+):")
+
+						if filename and lnum then
+							local start_line = tonumber(lnum)
+
+							-- Scan forward to find the matching 'def' statement
+							local f = io.open(filename, "r")
+							if f then
+								local current_line_idx = 0
+
+								for file_line in f:lines() do
+									current_line_idx = current_line_idx + 1
+
+									if current_line_idx >= start_line and current_line_idx <= start_line + 50 then
+										-- Look for exact function name match
+										if file_line:match("def%s+" .. func_name .. "%s*%(") then
+											f:close()
+											-- Jump to the file and line
+											vim.cmd("edit " .. filename)
+											vim.api.nvim_win_set_cursor(0, { current_line_idx, 0 })
+											vim.cmd("normal! zz") -- Center the line on screen
+											print("Found: " .. func_name .. " in " .. filename)
+											return
+										end
+									elseif current_line_idx > start_line + 50 then
+										break
+									end
+								end
+								f:close()
+							end
+						end
+					end
+
+					print("Function '" .. func_name .. "' not found in decorated functions")
+				end,
+			},
+			{
+				"<leader>cds",
+				desc = "[C]ode [D]agster [S]earch",
+				function()
+					local pickers = require("telescope.pickers")
+					local finders = require("telescope.finders")
+					local conf = require("telescope.config").values
+
+					-- Pattern needs to be properly quoted for shell
+					local decorator_pattern =
+						[['@(dim_asset|intermediate_asset|source_asset|curated_asset|conformed_asset|country_asset|concat_asset|fact_asset|mart_asset|analysis_asset|output_asset|published_asset)\(']]
+
+					-- Find all decorator locations
+					local cmd = "rg --pcre2 --with-filename --line-number --no-heading "
+						.. decorator_pattern
+						.. " "
+						.. vim.fn.getcwd()
+
+					local handle = io.popen(cmd)
+					local result = handle:read("*a")
+					handle:close()
+
+					if not result or result == "" then
+						print("No matches found")
+						return
+					end
+
+					local entries = {}
+
+					for line in result:gmatch("[^\r\n]+") do
+						local filename, lnum, decorator_match = line:match("^([^:]+):(%d+):.*@([%w_]+)%(")
+
+						if filename and lnum and decorator_match then
+							local start_line = tonumber(lnum)
+
+							-- Scan forward to find the 'def' statement
+							local f = io.open(filename, "r")
+							if f then
+								local current_line_idx = 0
+								local found_def = false
+								local func_name = nil
+								local def_line = nil
+
+								for file_line in f:lines() do
+									current_line_idx = current_line_idx + 1
+
+									-- Start looking from the decorator line
+									if current_line_idx >= start_line and current_line_idx <= start_line + 50 then
+										-- Look for 'def function_name'
+										local match = file_line:match("def%s+([%w_]+)")
+										if match then
+											func_name = match
+											def_line = current_line_idx
+											found_def = true
+											break
+										end
+									elseif current_line_idx > start_line + 50 then
+										break
+									end
+								end
+								f:close()
+
+								if found_def and func_name then
+									table.insert(entries, {
+										filename = filename,
+										lnum = def_line,
+										col = 1,
+										text = func_name,
+										decorator = decorator_match,
+									})
+								end
+							end
+						end
+					end
+
+					if #entries == 0 then
+						print("No function names extracted")
+						return
+					end
+
+					pickers
+						.new({}, {
+							prompt_title = "Functions under asset decorators",
+							finder = finders.new_table({
+								results = entries,
+								entry_maker = function(entry)
+									return {
+										value = entry,
+										display = entry.decorator .. ": " .. entry.text,
+										ordinal = entry.decorator .. " " .. entry.text,
+										filename = entry.filename,
+										lnum = entry.lnum,
+										col = entry.col,
+									}
+								end,
+							}),
+							sorter = conf.generic_sorter({}),
+							previewer = conf.grep_previewer({}),
+						})
+						:find()
+				end,
+			},
 		},
 	},
 	{
