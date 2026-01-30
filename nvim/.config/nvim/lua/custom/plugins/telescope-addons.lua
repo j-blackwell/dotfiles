@@ -139,6 +139,74 @@ return {
 				desc = "[F]ind [D]irectories",
 			},
 			{
+				"<leader>cdd",
+				desc = "[C]ode [D]agster [D]efinition",
+				function()
+					-- Get the function name under cursor
+					local func_name = vim.fn.expand("<cword>")
+
+					if not func_name or func_name == "" then
+						print("No word under cursor")
+						return
+					end
+
+					local decorator_pattern =
+						[['@(dim_asset|intermediate_asset|source_asset|curated_asset|conformed_asset|country_asset|concat_asset|fact_asset|mart_asset|analysis_asset|output_asset|published_asset)\(']]
+
+					-- Find all decorator locations
+					local cmd = "rg --pcre2 --with-filename --line-number --no-heading "
+						.. decorator_pattern
+						.. " "
+						.. vim.fn.getcwd()
+
+					local handle = io.popen(cmd)
+					local result = handle:read("*a")
+					handle:close()
+
+					if not result or result == "" then
+						print("No decorated functions found")
+						return
+					end
+
+					-- Search for the specific function
+					for line in result:gmatch("[^\r\n]+") do
+						local filename, lnum = line:match("^([^:]+):(%d+):")
+
+						if filename and lnum then
+							local start_line = tonumber(lnum)
+
+							-- Scan forward to find the matching 'def' statement
+							local f = io.open(filename, "r")
+							if f then
+								local current_line_idx = 0
+
+								for file_line in f:lines() do
+									current_line_idx = current_line_idx + 1
+
+									if current_line_idx >= start_line and current_line_idx <= start_line + 50 then
+										-- Look for exact function name match
+										if file_line:match("def%s+" .. func_name .. "%s*%(") then
+											f:close()
+											-- Jump to the file and line
+											vim.cmd("edit " .. filename)
+											vim.api.nvim_win_set_cursor(0, { current_line_idx, 0 })
+											vim.cmd("normal! zz") -- Center the line on screen
+											print("Found: " .. func_name .. " in " .. filename)
+											return
+										end
+									elseif current_line_idx > start_line + 50 then
+										break
+									end
+								end
+								f:close()
+							end
+						end
+					end
+
+					print("Function '" .. func_name .. "' not found in decorated functions")
+				end,
+			},
+			{
 				"<leader>cds",
 				desc = "[C]ode [D]agster [S]earch",
 				function()
