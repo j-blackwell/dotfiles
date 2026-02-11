@@ -1,5 +1,5 @@
 # utils
-sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep amd-ucode jq fd btop alsa-utils playerctl tesseract
+sudo pacman -S wl-clipboard reflector pacman-contrib xdg-desktop-portal xdg-desktop-portal-wlr grim ripgrep amd-ucode jq fd btop alsa-utils playerctl tesseract rpi-imager
 
 sudo systemctl enable reflector.service && sudo systemctl start reflector.service
 sudo systemctl enable fstrim.timer
@@ -64,6 +64,7 @@ sudo pacman -S rofi polybar rofi-emoji
 # apps
 sudo pacman -S firefox flameshot lazygit nautilus neovim tmux gimp obsidian syncthing github-cli
 yay -S pear-desktop noson-app zen-browser-bin
+curl -fsSL https://opencode.ai/install | bash
 # sudo systemctl enable syncthing@$USER.service
 # sudo systemctl start syncthing@$USER.service
 

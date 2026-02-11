@@ -37,3 +37,6 @@ if [ -f ~/.bashrc_custom ]; then
 fi
 
 # . "$HOME/.local/bin/env"
+
+# opencode
+export PATH=/home/jamesr/.opencode/bin:$PATH
