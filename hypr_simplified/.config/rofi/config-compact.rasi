@@ -36,7 +36,7 @@ configuration {
 @theme "~/.config/rofi/colors.rasi"
 
 /* ---- Load wallpaper ---- */
-@import "~/.config/ml4w/cache/current_wallpaper.rasi"
+@import "~/.config/rofi/wallpaper.rasi"
 
 /* ---- Load border width ---- */
 @import "~/.config/hypr/settings/rofi-border.rasi"
