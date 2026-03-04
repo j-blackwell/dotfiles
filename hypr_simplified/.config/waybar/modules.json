@@ -1,0 +1,167 @@
+// This file has been consolidated and simplified from ML4W into the Hyprland configuration directory.
+{
+  "hyprland/workspaces": {
+    "on-scroll-up": "hyprctl dispatch workspace r-1",
+    "on-scroll-down": "hyprctl dispatch workspace r+1",
+    "on-click": "activate",
+    "active-only": false,
+    "all-outputs": true,
+    "format": "{}",
+    "persistent-workspaces": {
+      "*": 1
+    }
+  },
+
+  "hyprland/window": {
+    "max-length": 60,
+    "rewrite": {
+      "(.*) - Brave": "$1",
+      "(.*) - Chromium": "$1",
+      "(.*) - Brave Search": "$1",
+      "(.*) - Outlook": "$1",
+      "(.*) Microsoft Teams": "$1"
+    },
+    "separate-outputs": true
+  },
+
+  "custom/idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "",
+      "deactivated": ""
+    },
+    "timeout": 30.5
+  },
+
+  "custom/updates": {
+    "format": "  {}",
+    "escape": true,
+    "return-type": "json",
+    "exec": "~/.config/hypr/scripts/updates.sh",
+    "interval": 1800,
+    "signal": 1,
+    "hide-empty-text": true,
+    "on-click": "~/.config/hypr/settings/installupdates.sh",
+    "on-click-right": "~/.config/hypr/settings/software.sh"
+  },
+
+
+  "custom/exit": {
+    "format": "",
+    "on-click": "~/.config/hypr/scripts/wlogout.sh",
+    "on-click-right": "hyprlock",
+    "tooltip-format": "Left: Power menu\nRight: Lock screen"
+  },
+
+  "custom/notification": {
+    "tooltip-format": "Left: Notifications\nRight: Do not disturb",
+    "format": "{icon}",
+    "format-icons": {
+      "notification": "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
+      "none": "",
+      "dnd-notification": "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
+      "dnd-none": "",
+      "inhibited-notification": "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
+      "inhibited-none": "",
+      "dnd-inhibited-notification": "<span rise='8pt'><span foreground='red'><sup></sup></span></span>",
+      "dnd-inhibited-none": ""
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  },
+
+  "tray": {
+    "icon-size": 21,
+    "spacing": 10
+  },
+
+  "clock": {
+    "format": "{:%Y-%m-%d %H:%M:%S}",
+    "tooltip-format": "{:%A\n%Y-%m-%d}",
+    "on-click": "flatpak run com.ml4w.calendar",
+    "timezone": "",
+    "tooltip": true,
+    "interval": 1
+  },
+
+  "cpu": {
+    "format": "󰻠 {usage}%",
+    "on-click": "~/.config/hypr/settings/system-monitor.sh",
+    "min-length": 5
+  },
+
+  "memory": {
+    "format": "  {}%",
+    "on-click": "~/.config/hypr/settings/system-monitor.sh",
+    "min-length": 5
+  },
+
+  "hyprland/language": {
+    "format": "  {short}"
+  },
+
+  "network": {
+    "format": "{ifname}",
+    "interval": 5,
+    "format-wifi": "  ↓{bandwidthDownBits}",
+    "format-ethernet": "   ↓{bandwidthDownBits}",
+    "format-disconnected": "Disconnected ⚠",
+    "tooltip-format": " {ifname} via {gwaddri}",
+    "tooltip-format-wifi": "  {ifname} @ {essid}\nIP: {ipaddr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\nUp: {bandwidthUpBits}\nDown: {bandwidthDownBits}",
+    "tooltip-format-ethernet": " {ifname}\nIP: {ipaddr}\n up: {bandwidthUpBits} down: {bandwidthDownBits}",
+    "tooltip-format-disconnected": "Disconnected",
+    "max-length": 50,
+    "on-click": "~/.config/hypr/settings/networkmanager.sh",
+    "on-click-right": "~/.config/hypr/scripts/nm-applet.sh toggle",
+    "min-length": 12
+  },
+
+  "battery": {
+    "states": {
+      "warning": 30,
+      "critical": 15
+    },
+    "format": "{icon} {capacity}%",
+    "format-charging": "  {capacity}%",
+    "format-plugged": "  {capacity}%",
+    "format-alt": "{icon}  {time}",
+    "format-icons": [" ", " ", " ", " ", " "]
+  },
+
+  "pulseaudio": {
+    "format": "{icon}   {volume}%",
+    "format-bluetooth": " {volume}% {icon}   {format_source}",
+    "format-bluetooth-muted": "   {format_source}",
+    "format-muted": " {format_source}",
+    "format-source": "{volume}% ",
+    "format-source-muted": "",
+    "format-icons": {
+      "headphone": " ",
+      "hands-free": " ",
+      "headset": " ",
+      "phone": " ",
+      "portable": " ",
+      "car": " ",
+      "default": ["", "", ""]
+    },
+    "on-click": "pavucontrol"
+  },
+
+  "bluetooth": {
+    "format": "",
+    "format-connected": " ",
+    "format-disconnected": " ",
+    "format-disabled": "",
+    "format-off": "",
+    "format-no-controller": "",
+    "interval": 30,
+    "on-click": "blueman-manager",
+    "tooltip": true,
+    "tooltip-format": "{device_alias}",
+    "min-length": 3
+  }
+}
