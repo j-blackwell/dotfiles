@@ -33,7 +33,7 @@ configuration {
 @import "~/.config/hypr/settings/rofi-font.rasi"
 
 /* ---- Load colors ---- */
-@theme "~/.config/rofi/colors.rasi"
+@theme "~/.local/share/matugen/rofi-colors.rasi"
 
 /* ---- Load wallpaper ---- */
 @import "~/.config/rofi/wallpaper.rasi"

@@ -107,6 +107,8 @@ def set_wallpaper_hyprland(file_path: str):
         subprocess.run(["hyprctl", "hyprpaper", "preload", file_path], capture_output=True)
         # Set the wallpaper
         subprocess.run(["hyprctl", "hyprpaper", "wallpaper", f",{file_path}"], check=True)
+        # Execute matugen
+        subprocess.run(["/home/jamesr/.cargo/bin/matugen", "image", file_path], check=True)
     except subprocess.CalledProcessError as e:
         typer.echo(f":: Error: Failed to set wallpaper using hyprctl: {e}", err=True)
 

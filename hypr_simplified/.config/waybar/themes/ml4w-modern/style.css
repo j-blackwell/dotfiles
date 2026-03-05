@@ -10,9 +10,9 @@
 */
 
 /* -----------------------------------------------------
- * Import Pywal colors
+ * Import Matugen colors
  * ----------------------------------------------------- */
-@import '../../colors.css';
+@import "/home/jamesr/.local/share/matugen/waybar-colors.css";
 @define-color color11 @on_primary_fixed;
 
 @define-color backgroundlight @on_surface;
