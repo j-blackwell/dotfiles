@@ -13,6 +13,7 @@ import subprocess
 import sys
 import re
 import shutil
+import time
 from pathlib import Path
 from typing import Annotated, List, Dict, Optional
 import typer
@@ -34,6 +35,36 @@ ROFI_PREVIEW_THEME = (
 def setup_directory(directory: str):
     os.makedirs(directory, exist_ok=True)
 
+def get_hyprland_signature() -> Optional[str]:
+    """Find the active Hyprland instance signature."""
+    # 1. Try to get signature from a running hyprpaper or hyprland process
+    for proc_name in ["hyprpaper", "Hyprland"]:
+        try:
+            pid = subprocess.check_output(["pgrep", "-x", proc_name]).decode().strip().split('\n')[0]
+            with open(f"/proc/{pid}/environ", "rb") as f:
+                environ = f.read().split(b'\0')
+                for env_var in environ:
+                    if env_var.startswith(b"HYPRLAND_INSTANCE_SIGNATURE="):
+                        return env_var.decode().split("=")[1]
+        except (subprocess.CalledProcessError, IndexError, FileNotFoundError):
+            continue
+
+    # 2. Fallback to filesystem discovery
+    runtime_dir = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+    hypr_dir = Path(runtime_dir) / "hypr"
+    
+    if hypr_dir.exists():
+        instances = []
+        for d in hypr_dir.glob("*"):
+            if d.is_dir() and ((d / ".hyprpaper.sock").exists() or (d / "hyprland.log").exists()):
+                instances.append(d)
+        
+        if instances:
+            instances.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+            return instances[0].name
+            
+    return os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+
 def get_reddit_posts(subreddit: str, limit: int = 25) -> List[Dict]:
     headers = {"User-Agent": USER_AGENT}
     url = f"https://www.reddit.com/r/{subreddit}/hot/.json?t=day&limit={limit}"
@@ -51,7 +82,6 @@ def get_image_url_from_post(post_data: Dict) -> Optional[str]:
     if post_data.get("is_gallery"):
         metadata = post_data.get("media_metadata", {})
         if metadata:
-            # Get the first image in the gallery
             first_item = list(metadata.values())[0]
             image_url = first_item.get("s", {}).get("u")
     else:
@@ -62,21 +92,17 @@ def get_image_url_from_post(post_data: Dict) -> Optional[str]:
     return None
 
 def get_thumbnail_url(post_data: Dict) -> Optional[str]:
-    # Try to get a decent resolution preview
     preview = post_data.get("preview", {}).get("images", [])
     if preview:
         resolutions = preview[0].get("resolutions", [])
         if resolutions:
-            # Pick a middle resolution (around 640px wide if possible)
             idx = min(len(resolutions) - 1, 3) 
             return resolutions[idx].get("url").replace("&amp;", "&")
     
-    # Fallback to thumbnail if it's a URL
     thumb = post_data.get("thumbnail")
     if thumb and thumb.startswith("http"):
         return thumb.replace("&amp;", "&")
         
-    # Gallery fallback
     if post_data.get("is_gallery"):
         metadata = post_data.get("media_metadata", {})
         if metadata:
@@ -89,28 +115,61 @@ def get_thumbnail_url(post_data: Dict) -> Optional[str]:
     return None
 
 def download_file(url: str, dest_path: str):
-    if os.path.exists(dest_path):
-        return True
     headers = {"User-Agent": USER_AGENT}
     try:
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
-        with open(dest_path, "wb") as f:
-            f.write(response.content)
-        return True
+        
+        # Check actual content type to determine extension
+        content = response.content
+        extension = ".jpg"
+        if content.startswith(b"\x89PNG"):
+            extension = ".png"
+        elif content.startswith(b"GIF8"):
+            extension = ".gif"
+        
+        # Adjust dest_path if needed
+        base_path = os.path.splitext(dest_path)[0]
+        final_path = base_path + extension
+        
+        with open(final_path, "wb") as f:
+            f.write(content)
+        return final_path
     except Exception:
-        return False
+        return None
 
 def set_wallpaper_hyprland(file_path: str):
+    signature = get_hyprland_signature()
+    env = os.environ.copy()
+    if signature:
+        env["HYPRLAND_INSTANCE_SIGNATURE"] = signature
+
     try:
-        # Preload the image (necessary for hyprpaper)
-        subprocess.run(["hyprctl", "hyprpaper", "preload", file_path], capture_output=True)
-        # Set the wallpaper
-        subprocess.run(["hyprctl", "hyprpaper", "wallpaper", f",{file_path}"], check=True)
-        # Execute matugen
-        subprocess.run(["/home/jamesr/.cargo/bin/matugen", "image", file_path], check=True)
-    except subprocess.CalledProcessError as e:
-        typer.echo(f":: Error: Failed to set wallpaper using hyprctl: {e}", err=True)
+        subprocess.run(["pgrep", "-x", "hyprpaper"], check=True, capture_output=True)
+    except subprocess.CalledProcessError:
+        typer.echo(":: Starting hyprpaper...")
+        subprocess.Popen(["hyprpaper"], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for _ in range(30):
+            if signature:
+                socket_path = Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")) / "hypr" / signature / ".hyprpaper.sock"
+                if socket_path.exists():
+                    break
+            time.sleep(0.1)
+
+    try:
+        # Preload wallpaper (ignore errors if already preloaded)
+        subprocess.run(["hyprctl", "hyprpaper", "preload", file_path], env=env, capture_output=True)
+        
+        # Set wallpaper
+        result = subprocess.run(["hyprctl", "hyprpaper", "wallpaper", f",{file_path}"], env=env, capture_output=True, text=True)
+        if result.returncode != 0:
+            typer.echo(f":: Error setting wallpaper: {result.stderr.strip()}", err=True)
+        
+        # Execute matugen with the same environment (to ensure hyprctl reload works)
+        matugen_cmd = [os.path.expanduser("~/.cargo/bin/matugen"), "image", file_path]
+        subprocess.run(matugen_cmd, env=env, check=True)
+    except Exception as e:
+        typer.echo(f":: Unexpected Error: {e}", err=True)
 
 @app.command()
 def fetch(
@@ -125,10 +184,16 @@ def fetch(
     setup_directory(directory)
     
     today = datetime.date.today().strftime("%Y-%m-%d")
-    date_file = os.path.join(directory, f"{today}.jpg")
-    current_file = os.path.join(directory, "current.jpg")
+    current_file_base = os.path.join(directory, "current")
+    
+    # Try to find existing current file with any image extension
+    current_file = None
+    for ext in [".jpg", ".png"]:
+        if os.path.exists(current_file_base + ext):
+            current_file = current_file_base + ext
+            break
 
-    if not force and os.path.exists(date_file):
+    if not force and current_file and os.path.exists(os.path.join(directory, f"{today}{os.path.splitext(current_file)[1]}")):
         set_wallpaper_hyprland(current_file)
         return
 
@@ -145,9 +210,18 @@ def fetch(
 
         url = get_image_url_from_post(post_data)
         if url:
-            if download_file(url, date_file):
-                shutil.copy2(date_file, current_file)
-                set_wallpaper_hyprland(current_file)
+            date_file_placeholder = os.path.join(directory, f"{today}.jpg")
+            downloaded_path = download_file(url, date_file_placeholder)
+            if downloaded_path:
+                ext = os.path.splitext(downloaded_path)[1]
+                # Clean up old current files
+                for old_ext in [".jpg", ".png"]:
+                    try: os.remove(current_file_base + old_ext)
+                    except FileNotFoundError: pass
+                
+                new_current = current_file_base + ext
+                shutil.copy2(downloaded_path, new_current)
+                set_wallpaper_hyprland(new_current)
                 return
 
     typer.echo(":: Error: No suitable wallpaper found.", err=True)
@@ -159,9 +233,6 @@ def select(
     directory: Annotated[str, typer.Option(help="Directory to save wallpapers")] = os.path.expanduser("~/Pictures/reddit_wallpaper"),
     exclude: Annotated[str, typer.Option(help="Regex of keywords to exclude")] = r"dump|32:9|ai|vehicles|anime|meme|gaming|abstract",
 ):
-    """
-    Select a wallpaper from the top reddit posts using Rofi with previews.
-    """
     setup_directory(directory)
     cache_dir = os.path.join(directory, ".cache")
     os.makedirs(cache_dir, exist_ok=True)
@@ -174,120 +245,96 @@ def select(
         data = post.get("data", {})
         title = data.get("title", "")
         flair = (data.get("link_flair_text") or "")
-        
         if exclude_pattern.search(title) or (flair and exclude_pattern.search(flair)):
             continue
-            
         url = get_image_url_from_post(data)
         if url:
             thumb_url = get_thumbnail_url(data) or url
             post_id = data.get("id")
             thumb_path = os.path.join(cache_dir, f"{post_id}.jpg")
-            valid_posts.append({
-                "title": title, 
-                "url": url, 
-                "thumb_url": thumb_url, 
-                "id": post_id, 
-                "thumb_path": thumb_path
-            })
+            valid_posts.append({"title": title, "url": url, "thumb_url": thumb_url, "id": post_id, "thumb_path": thumb_path})
 
     if not valid_posts:
         typer.echo(":: Error: No valid posts found.", err=True)
         return
 
-    # Parallel download thumbnails
     typer.echo(":: Fetching previews...")
     with ThreadPoolExecutor(max_workers=10) as executor:
         executor.map(lambda p: download_file(p["thumb_url"], p["thumb_path"]), valid_posts)
 
-    # Prepare Rofi menu entries
     menu_entries = []
     for p in valid_posts:
-        if os.path.exists(p["thumb_path"]):
-            menu_entries.append(f"{p['title']}\0icon\x1f{p['thumb_path']}")
+        icon_path = None
+        for ext in [".jpg", ".png"]:
+            p_path = os.path.join(cache_dir, f"{p['id']}{ext}")
+            if os.path.exists(p_path):
+                icon_path = p_path
+                break
+        
+        if icon_path:
+            menu_entries.append(f"{p['title']}\0icon\x1f{icon_path}")
         else:
             menu_entries.append(p["title"])
 
-    menu_input = "\n".join(menu_entries)
-    
     rofi_process = subprocess.run(
-        [
-            "rofi", "-dmenu", "-i", 
-            "-p", f"Select from r/{subreddit}", 
-            "-show-icons",
-            "-theme-str", ROFI_PREVIEW_THEME
-        ],
-        input=menu_input,
-        text=True,
-        capture_output=True
+        ["rofi", "-dmenu", "-i", "-p", f"Select from r/{subreddit}", "-show-icons", "-theme-str", ROFI_PREVIEW_THEME],
+        input="\n".join(menu_entries), text=True, capture_output=True
     )
 
     selected_line = rofi_process.stdout.strip()
-    if not selected_line:
-        return
-
-    # Find the selected post
+    if not selected_line: return
     selected_post = next((p for p in valid_posts if p["title"] == selected_line), None)
-    if not selected_post:
-        return
+    if not selected_post: return
 
-    # Download and set
-    filename = f"{datetime.date.today().strftime('%Y-%m-%d')}_{selected_post['id']}.jpg"
-    dest_path = os.path.join(directory, filename)
-    current_file = os.path.join(directory, "current.jpg")
-
-    if download_file(selected_post["url"], dest_path):
-        shutil.copy2(dest_path, current_file)
-        set_wallpaper_hyprland(current_file)
+    filename_base = f"{datetime.date.today().strftime('%Y-%m-%d')}_{selected_post['id']}"
+    current_file_base = os.path.join(directory, "current")
+    
+    downloaded_path = download_file(selected_post["url"], os.path.join(directory, filename_base + ".jpg"))
+    if downloaded_path:
+        ext = os.path.splitext(downloaded_path)[1]
+        for old_ext in [".jpg", ".png"]:
+            try: os.remove(current_file_base + old_ext)
+            except FileNotFoundError: pass
+        new_current = current_file_base + ext
+        shutil.copy2(downloaded_path, new_current)
+        set_wallpaper_hyprland(new_current)
 
 @app.command()
 def local(
     directory: Annotated[str, typer.Option(help="Directory to pick wallpapers from")] = os.path.expanduser("~/Pictures/reddit_wallpaper"),
 ):
-    """
-    Pick a wallpaper from locally downloaded files.
-    """
     wallpaper_dir = Path(directory)
     if not wallpaper_dir.exists():
         typer.echo(f":: Error: Directory {directory} does not exist.", err=True)
         return
 
-    # Create entries with icon metadata for Rofi
     entries = []
-    # Only include actual images, excluding current.jpg and .cache
-    for x in sorted(wallpaper_dir.glob("*.jpg"), reverse=True):
-        if x.name == "current.jpg":
-            continue
+    for x in sorted(list(wallpaper_dir.glob("*.jpg")) + list(wallpaper_dir.glob("*.png")), reverse=True):
+        if x.stem == "current": continue
         entries.append(f"{x.name}\0icon\x1f{x.absolute()}")
 
     if not entries:
         typer.echo(":: No local wallpapers found.", err=True)
         return
 
-    wallpaper_menu = "\n".join(entries)
-
     result = subprocess.run(
-        [
-            "rofi", "-dmenu", "-i", 
-            "-p", "Local Wallpapers", 
-            "-show-icons",
-            "-theme-str", ROFI_PREVIEW_THEME
-        ],
-        input=wallpaper_menu,
-        text=True,
-        capture_output=True,
+        ["rofi", "-dmenu", "-i", "-p", "Local Wallpapers", "-show-icons", "-theme-str", ROFI_PREVIEW_THEME],
+        input="\n".join(entries), text=True, capture_output=True,
     )
     
     selected_line = result.stdout.strip()
-    if not selected_line:
-        return
-
+    if not selected_line: return
     selected_path = (wallpaper_dir / selected_line).resolve()
-    current_file = wallpaper_dir / "current.jpg"
-
+    
     if selected_path.exists():
-        shutil.copy2(str(selected_path), str(current_file))
-        set_wallpaper_hyprland(str(current_file))
+        ext = selected_path.suffix
+        current_file_base = os.path.join(directory, "current")
+        for old_ext in [".jpg", ".png"]:
+            try: os.remove(current_file_base + old_ext)
+            except FileNotFoundError: pass
+        new_current = current_file_base + ext
+        shutil.copy2(str(selected_path), new_current)
+        set_wallpaper_hyprland(new_current)
 
 if __name__ == "__main__":
     app()
