@@ -95,19 +95,20 @@
   },
 
   "memory": {
-    "format": "  {}%",
+    "format": " {}%",
     "on-click": "~/.config/hypr/settings/system-monitor.sh",
     "min-length": 5
   },
 
   "hyprland/language": {
-    "format": "  {short}"
+    "format": " {short}",
+    "min-length": 5
   },
 
   "network": {
     "format": "{ifname}",
     "interval": 5,
-    "format-wifi": "  ↓{bandwidthDownBits}",
+    "format-wifi": " {bandwidthDownBits}",
     "format-ethernet": "   ↓{bandwidthDownBits}",
     "format-disconnected": "Disconnected ⚠",
     "tooltip-format": " {ifname} via {gwaddri}",
