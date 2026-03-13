@@ -1,0 +1,54 @@
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "typer",
+# ]
+# ///
+
+import os
+import subprocess
+from pathlib import Path
+
+import typer
+
+
+def get_terminal():
+    terminal_setting = Path("~/.config/hypr/settings/terminal.sh")
+    with open(terminal_setting.expanduser(), "r") as f:
+        data = f.read().strip()
+
+    return data
+
+
+def open_project(code_project: str):
+    if not code_project:
+        print("No project set")
+        return
+
+    tmux_name = Path(code_project).name
+
+    subprocess.Popen(
+        [
+            get_terminal(),
+            "tmux",
+            "new-session",
+            "-A",
+            "-s",
+            tmux_name,
+            "zsh",
+            "-c",
+            f"cd {code_project} && nvim .; zsh",
+        ]
+    )
+
+
+app = typer.Typer()
+
+
+@app.command()
+def main(code_project: str):
+    open_project(code_project)
+
+
+if __name__ == "__main__":
+    app()
