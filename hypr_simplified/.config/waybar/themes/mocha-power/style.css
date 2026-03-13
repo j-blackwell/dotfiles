@@ -75,6 +75,7 @@
 /* Main bar modules */
 #cava,
 #waybar.main #custom-headsetbattery,
+#waybar.main #custom-updates,
 #waybar.main #custom-nvidia,
 #waybar.main #custom-weather,
 #waybar.main #custom-battery,
@@ -94,6 +95,15 @@
 #waybar.main #tray,
 #waybar.main #window,
 #waybar.main #disk,
+
+#custom-updates {
+    color: @performance;
+    background: @background1;
+}
+#custom-calendar {
+    padding-left: 8pt;
+    padding-right: 8pt;
+}
 #custom-timer {
     padding-left: 8pt;
     padding-right: 8pt;
@@ -134,6 +144,7 @@
 }
 
 #waybar.main #custom-weather,
+#waybar.main #custom-calendar,
 #waybar.main #clock,
 #custom-timer {
     color: @date;

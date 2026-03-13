@@ -37,6 +37,8 @@
 
         "modules-right": [
             "custom/spacer1",
+            "custom/updates",
+            "custom/spacer-bg1",
             "temperature",
             "custom/spacer-bg1",
             "cpu",
@@ -57,7 +59,7 @@
             "custom/spacer4",
             "custom/weather",
             "custom/spacer-bg2",
-            "custom/timer",
+            "custom/calendar",
             "custom/spacer-bg2",
             "clock"
         ],

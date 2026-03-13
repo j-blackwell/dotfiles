@@ -79,11 +79,19 @@
     "spacing": 10
   },
 
+  "custom/calendar": {
+    "format": "{}",
+    "interval": 60,
+    "exec": "~/.config/waybar/scripts/calendar-countdown.sh",
+    "return-type": "json",
+    "max-length": 25,
+    "on-click": "xdg-open https://calendar.google.com/calendar/u/0/r/week?pli=1"
+  },
+
   "clock": {
     "format": "{:%Y-%m-%d %H:%M:%S}",
     "tooltip-format": "{:%A\n%Y-%m-%d}",
-    "on-click": "flatpak run com.ml4w.calendar",
-    "timezone": "",
+    "timezone": "Europe/London",
     "tooltip": true,
     "interval": 1
   },
