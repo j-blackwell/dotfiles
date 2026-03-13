@@ -426,7 +426,52 @@ require("lazy").setup({
 			--  - va)  - [V]isually select [A]round [)]paren
 			--  - yinq - [Y]ank [I]nside [N]ext [']quote
 			--  - ci'  - [C]hange [I]nside [']quote
-			require("mini.ai").setup({ n_lines = 500 })
+			local ai = require("mini.ai")
+			ai.setup({
+				n_lines = 500,
+				custom_textobjects = {
+					s = { -- Subword (between _, -, etc.)
+						{
+							"%u[%l%d]+%f[^%l%d]",
+							"%f[%S][%l%d]+%f[^%l%d]",
+							"%f[%P][%l%d]+%f[^%l%d]",
+							"^[%l%d]+%f[^%l%d]",
+						},
+						"^().*()$",
+					},
+					x = function(ai_type) -- Paragraph with same or more indentation
+						local line = vim.fn.line(".")
+						local indent = vim.fn.indent(line)
+						local st, en = line, line
+						for i = line - 1, 1, -1 do
+							if vim.fn.getline(i):match("^%s*$") or vim.fn.indent(i) < indent then
+								break
+							end
+							st = i
+						end
+						for i = line + 1, vim.fn.line("$") do
+							if vim.fn.getline(i):match("^%s*$") or vim.fn.indent(i) < indent then
+								break
+							end
+							en = i
+						end
+						if ai_type == "a" then
+							if vim.fn.getline(en + 1):match("^%s*$") then
+								en = en + 1
+							elseif vim.fn.getline(st - 1):match("^%s*$") then
+								st = st - 1
+							end
+						end
+						return { { from = { line = st, col = 1 }, to = { line = en, col = #vim.fn.getline(en) } } }
+					end,
+					h = { -- Python type hints
+						{
+							":%s*()[%w%._%[%]%, ]*[%w%._%[%]]()",
+							"->%s*()[%w%._%[%]%, ]*[%w%._%[%]]()",
+						},
+					},
+				},
+			})
 
 			-- Add/delete/replace surroundings (brackets, quotes, etc.)
 			--
