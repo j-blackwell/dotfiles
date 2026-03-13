@@ -157,6 +157,11 @@ def set_wallpaper_hyprland(file_path: str):
             time.sleep(0.1)
 
     try:
+        # Create current.png for other tools
+        current_png = os.path.join(os.path.dirname(file_path), "current.png")
+        if os.path.abspath(file_path) != os.path.abspath(current_png):
+            subprocess.run(["magick", file_path, current_png], check=True)
+
         # Preload wallpaper (ignore errors if already preloaded)
         subprocess.run(["hyprctl", "hyprpaper", "preload", file_path], env=env, capture_output=True)
         
