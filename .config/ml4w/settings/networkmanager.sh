@@ -1,1 +1,0 @@
-nmcli device wifi rescan; $(cat ~/.config/ml4w/settings/terminal.sh) --class dotfiles-floating -e nmtui
