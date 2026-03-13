@@ -45,7 +45,7 @@
             "custom/spacer-bg1",
             "memory",
             "custom/spacer-bg1",
-            "network",
+            "custom/bandwidth",
             "custom/spacer2",
             "pulseaudio",
             "custom/spacer3",

@@ -129,6 +129,14 @@
     "min-length": 12
   },
 
+  "custom/bandwidth": {
+    "format": "{}",
+    "interval": 2,
+    "exec": "~/.config/waybar/scripts/bandwidth-bar.sh",
+    "return-type": "json",
+    "on-click": "~/.config/hypr/settings/networkmanager.sh"
+  },
+
   "battery": {
     "states": {
       "warning": 30,
