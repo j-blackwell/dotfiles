@@ -37,18 +37,18 @@
     "format": "  {}",
     "escape": true,
     "return-type": "json",
-    "exec": "~/.local/bin/updates.sh",
+    "exec": "~/.local/bin/custom/updates.sh",
     "interval": 1800,
     "signal": 1,
     "hide-empty-text": true,
-    "on-click": "~/.local/bin/installupdates-launcher.sh",
+    "on-click": "~/.local/bin/custom/installupdates-launcher.sh",
     "on-click-right": "~/.config/hypr/settings/software.sh"
   },
 
 
   "custom/exit": {
     "format": "",
-    "on-click": "~/.local/bin/wlogout.sh",
+    "on-click": "~/.local/bin/custom/wlogout.sh",
     "on-click-right": "hyprlock",
     "tooltip-format": "Left: Power menu\nRight: Lock screen"
   },
@@ -82,7 +82,7 @@
   "custom/calendar": {
     "format": "{}",
     "interval": 60,
-    "exec": "~/.local/bin/calendar-countdown.sh",
+    "exec": "~/.local/bin/custom/calendar-countdown.sh",
     "return-type": "json",
     "max-length": 25,
     "on-click": "xdg-open https://calendar.google.com/calendar/u/0/r/week?pli=1"
@@ -125,14 +125,14 @@
     "tooltip-format-disconnected": "Disconnected",
     "max-length": 50,
     "on-click": "~/.config/hypr/settings/networkmanager.sh",
-    "on-click-right": "~/.local/bin/nm-applet.sh toggle",
+    "on-click-right": "~/.local/bin/custom/nm-applet.sh toggle",
     "min-length": 12
   },
 
   "custom/bandwidth": {
     "format": "{}",
     "interval": 2,
-    "exec": "~/.local/bin/bandwidth-bar.sh",
+    "exec": "~/.local/bin/custom/bandwidth-bar.sh",
     "return-type": "json",
     "on-click": "~/.config/hypr/settings/networkmanager.sh"
   },

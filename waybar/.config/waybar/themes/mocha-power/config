@@ -65,13 +65,13 @@
         ],
 
         "custom/timer": {
-            "exec": "~/.local/bin/timer.sh",
+            "exec": "~/.local/bin/custom/timer.sh",
             "return-type": "json",
             "format": "{}",
-            "on-click": "~/.local/bin/timer.sh toggle",
-            "on-click-right": "~/.local/bin/timer.sh reset",
-            "on-scroll-up": "~/.local/bin/timer.sh add",
-            "on-scroll-down": "~/.local/bin/timer.sh sub",
+            "on-click": "~/.local/bin/custom/timer.sh toggle",
+            "on-click-right": "~/.local/bin/custom/timer.sh reset",
+            "on-scroll-up": "~/.local/bin/custom/timer.sh add",
+            "on-scroll-down": "~/.local/bin/custom/timer.sh sub",
             "interval": 1,
             "tooltip": true
         },

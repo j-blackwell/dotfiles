@@ -76,7 +76,7 @@
                 },
                 {
                     "label": "",
-                    "command": "bash -c $HOME/.local/bin/wlogout.sh"
+                    "command": "bash -c $HOME/.local/bin/custom/wlogout.sh"
                 }
             ]
         }

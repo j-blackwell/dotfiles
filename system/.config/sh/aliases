@@ -15,8 +15,8 @@ alias vim='$EDITOR'
 alias wifi='nmtui'
 
 # ML4W / System
-alias ml4w-diagnosis='~/.local/bin/diagnosis.sh'
-alias ml4w-hyprland-diagnosis='~/.local/bin/diagnosis.sh'
+alias ml4w-diagnosis='~/.local/bin/custom/diagnosis.sh'
+alias ml4w-hyprland-diagnosis='~/.local/bin/custom/diagnosis.sh'
 alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
 
 # Scripts

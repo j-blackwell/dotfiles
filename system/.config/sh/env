@@ -8,6 +8,7 @@ export OPENCODE_CONFIG="$HOME/.config/opencode/config.json"
 
 # Local bin
 [[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
+[[ -d "$HOME/.local/bin/custom" ]] && export PATH="$HOME/.local/bin/custom:$PATH"
 
 # OpenCode
 [[ -d "$HOME/.opencode/bin" ]] && export PATH="$HOME/.opencode/bin:$PATH"

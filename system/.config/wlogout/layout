@@ -1,30 +1,30 @@
 {
     "label" : "lock",
-    "action" : "~/.local/bin/power.sh lock",
+    "action" : "~/.local/bin/custom/power.sh lock",
     "text" : "Lock",
     "keybind" : "l"
 }
 {
     "label" : "logout",
-    "action" : "~/.local/bin/power.sh exit",
+    "action" : "~/.local/bin/custom/power.sh exit",
     "text" : "Log Out",
     "keybind" : "e"
 }
 {
     "label" : "suspend",
-    "action" : "~/.local/bin/power.sh suspend",
+    "action" : "~/.local/bin/custom/power.sh suspend",
     "text" : "Suspend",
     "keybind" : "u"
 }
 {
     "label" : "reboot",
-    "action" : "~/.local/bin/power.sh reboot",
+    "action" : "~/.local/bin/custom/power.sh reboot",
     "text" : "Restart",
     "keybind" : "r"
 }
 {
     "label" : "shutdown",
-    "action" : "~/.local/bin/power.sh shutdown",
+    "action" : "~/.local/bin/custom/power.sh shutdown",
     "text" : "Power Off",
     "keybind" : "s"
 }

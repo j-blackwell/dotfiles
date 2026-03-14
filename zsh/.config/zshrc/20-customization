@@ -39,9 +39,8 @@ setopt appendhistory
 
 # -----------------------------------------------------
 # Prompt
-# -----------------------------------------------------
 # eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
-eval "$(oh-my-posh init zsh --config $HOME/.local/share/ohmyposh/EDM115-newline.omp.json)"
+eval "$(oh-my-posh init zsh --config ~/.local/share/ohmyposh/theme.omp.json)"
 
 # Shipped Theme
 # eval "$(oh-my-posh init zsh --config /usr/share/oh-my-posh/themes/agnoster.omp.json)"
