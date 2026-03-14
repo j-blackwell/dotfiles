@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "google/gemini-flash-latest",
+  "instructions": [
+    "~/.config/opencode/instructions.md"
+  ],
+  "autoupdate": "notify",
+  "theme": "system",
+  "permission": {
+    "bash": "ask",
+    "edit": "ask",
+    "read": "allow",
+    "glob": "allow"
+  }
+}
