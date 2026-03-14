@@ -1,0 +1,13 @@
+# -----------------------------------------------------
+# SHARED ENVIRONMENT VARIABLES
+# -----------------------------------------------------
+
+export EDITOR="nvim"
+export VISUAL="nvim"
+export OPENCODE_CONFIG="$HOME/.config/opencode/config.json"
+
+# Local bin
+[[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
+
+# OpenCode
+[[ -d "$HOME/.opencode/bin" ]] && export PATH="$HOME/.opencode/bin:$PATH"

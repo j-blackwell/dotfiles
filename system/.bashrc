@@ -1,5 +1,5 @@
 # -----------------------------------------------------
-# ZSH ALIASES & CONFIG
+# Bash Configuration
 # -----------------------------------------------------
 
 # Load shared environment and aliases
@@ -7,7 +7,14 @@
 [[ -f ~/.config/sh/aliases ]] && source ~/.config/sh/aliases
 
 # -----------------------------------------------------
-# ZSH Specific Aliases
+# Bash Specifics
 # -----------------------------------------------------
 
-# Add any aliases here that use ZSH-specific syntax or features
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+# Shell Prompt
+PS1='[\u@\h \W]\$ '
+
+# Load single customization file (if exists)
+[[ -f ~/.bashrc_custom ]] && source ~/.bashrc_custom

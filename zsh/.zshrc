@@ -8,6 +8,11 @@
 # Optimized zshrc loader
 # -----------------------------------------------------
 
+# Guard: only run in zsh
+if [ -z "$ZSH_VERSION" ]; then
+    return
+fi
+
 # Load modular configuration
 # Sources files from ~/.config/zshrc/ unless a version exists in custom/
 for f in ~/.config/zshrc/*(N-.); do
