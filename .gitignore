@@ -1,0 +1,10 @@
+# Generated color files
+**/colors.conf
+**/colors.css
+**/colors.rasi
+**/colors-matugen.conf
+**/colors.json
+
+# IPython history
+**/history.sqlite
+**/history-corrupt-*.sqlite

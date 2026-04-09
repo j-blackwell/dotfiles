@@ -1,6 +1,6 @@
 /* Colors */
 
-@import 'colors.css';
+@import "/home/jamesr/.local/share/matugen/swaync-colors.css";
 @define-color background @background;
 @define-color groupbackground @background;
 @define-color buttoncolor @secondary;
