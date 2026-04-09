@@ -3,6 +3,8 @@
 # dependencies = [
 #     "requests",
 #     "typer",
+#     "wallhaven",
+#     "typing_extensions",
 # ]
 # ///
 
@@ -18,6 +20,7 @@ from pathlib import Path
 from typing import Annotated, List, Dict, Optional
 import typer
 from concurrent.futures import ThreadPoolExecutor
+from wallhaven.api import Wallhaven
 
 app = typer.Typer()
 
@@ -65,55 +68,6 @@ def get_hyprland_signature() -> Optional[str]:
             
     return os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
 
-def get_reddit_posts(subreddit: str, limit: int = 25) -> List[Dict]:
-    headers = {"User-Agent": USER_AGENT}
-    url = f"https://www.reddit.com/r/{subreddit}/hot/.json?t=day&limit={limit}"
-    
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json().get("data", {}).get("children", [])
-    except Exception as e:
-        typer.echo(f":: Error: Failed to fetch Reddit JSON: {e}", err=True)
-        return []
-
-def get_image_url_from_post(post_data: Dict) -> Optional[str]:
-    image_url = None
-    if post_data.get("is_gallery"):
-        metadata = post_data.get("media_metadata", {})
-        if metadata:
-            first_item = list(metadata.values())[0]
-            image_url = first_item.get("s", {}).get("u")
-    else:
-        image_url = post_data.get("url")
-
-    if image_url:
-        return image_url.replace("&amp;", "&")
-    return None
-
-def get_thumbnail_url(post_data: Dict) -> Optional[str]:
-    preview = post_data.get("preview", {}).get("images", [])
-    if preview:
-        resolutions = preview[0].get("resolutions", [])
-        if resolutions:
-            idx = min(len(resolutions) - 1, 3) 
-            return resolutions[idx].get("url").replace("&amp;", "&")
-    
-    thumb = post_data.get("thumbnail")
-    if thumb and thumb.startswith("http"):
-        return thumb.replace("&amp;", "&")
-        
-    if post_data.get("is_gallery"):
-        metadata = post_data.get("media_metadata", {})
-        if metadata:
-            first_item = list(metadata.values())[0]
-            previews = first_item.get("p", [])
-            if previews:
-                idx = min(len(previews) - 1, 3)
-                return previews[idx].get("u").replace("&amp;", "&")
-    
-    return None
-
 def download_file(url: str, dest_path: str):
     headers = {"User-Agent": USER_AGENT}
     try:
@@ -137,6 +91,55 @@ def download_file(url: str, dest_path: str):
         return final_path
     except Exception:
         return None
+
+def get_reddit_posts(subreddit: str, limit: int = 25) -> List[Dict]:
+    headers = {"User-Agent": USER_AGENT}
+    url = f"https://www.reddit.com/r/{subreddit}/hot/.json?t=day&limit={limit}"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json().get("data", {}).get("children", [])
+    except Exception as e:
+        typer.echo(f":: Error: Failed to fetch Reddit JSON: {e}", err=True)
+        return []
+
+def get_image_url_from_reddit_post(post_data: Dict) -> Optional[str]:
+    image_url = None
+    if post_data.get("is_gallery"):
+        metadata = post_data.get("media_metadata", {})
+        if metadata:
+            first_item = list(metadata.values())[0]
+            image_url = first_item.get("s", {}).get("u")
+    else:
+        image_url = post_data.get("url")
+
+    if image_url:
+        return image_url.replace("&amp;", "&")
+    return None
+
+def get_thumbnail_url_from_reddit_post(post_data: Dict) -> Optional[str]:
+    preview = post_data.get("preview", {}).get("images", [])
+    if preview:
+        resolutions = preview[0].get("resolutions", [])
+        if resolutions:
+            idx = min(len(resolutions) - 1, 3) 
+            return resolutions[idx].get("url").replace("&amp;", "&")
+    
+    thumb = post_data.get("thumbnail")
+    if thumb and thumb.startswith("http"):
+        return thumb.replace("&amp;", "&")
+        
+    if post_data.get("is_gallery"):
+        metadata = post_data.get("media_metadata", {})
+        if metadata:
+            first_item = list(metadata.values())[0]
+            previews = first_item.get("p", [])
+            if previews:
+                idx = min(len(previews) - 1, 3)
+                return previews[idx].get("u").replace("&amp;", "&")
+    
+    return None
 
 def set_wallpaper_hyprland(file_path: str):
     signature = get_hyprland_signature()
@@ -178,13 +181,20 @@ def set_wallpaper_hyprland(file_path: str):
 
 @app.command()
 def fetch(
-    subreddit: Annotated[str, typer.Option(help="Subreddit to fetch from")] = "WidescreenWallpaper",
-    directory: Annotated[str, typer.Option(help="Directory to save wallpapers")] = os.path.expanduser("~/Pictures/reddit_wallpaper"),
-    exclude: Annotated[str, typer.Option(help="Regex of keywords to exclude")] = r"dump|32:9|ai|vehicles|anime|meme|gaming|abstract",
+    source: Annotated[str, typer.Option(help="Source to fetch from (wallhaven, reddit)")] = "wallhaven",
+    subreddit: Annotated[str, typer.Option(help="Subreddit to fetch from (if source=reddit)")] = "WidescreenWallpaper",
+    sorting: Annotated[str, typer.Option(help="Sorting criteria (date_added, relevance, random, views, favorites, toplist)")] = "favorites",
+    top_range: Annotated[str, typer.Option(help="Range for toplist (1d, 1w, 1M, 3M, 6M, 1y)")] = "1M",
+    categories: Annotated[str, typer.Option(help="Categories (general, anime, people) as binary (e.g. 110)")] = "100",
+    purity: Annotated[str, typer.Option(help="Purity bitfield (SFW, Sketchy, NSFW) as binary (e.g. 100)")] = "100",
+    ratio: Annotated[str, typer.Option(help="Aspect ratio (if source=wallhaven, e.g. 21x9)")] = "21x9",
+    order: Annotated[str, typer.Option(help="Sort order (desc, asc)")] = "desc",
+    directory: Annotated[str, typer.Option(help="Directory to save wallpapers")] = os.path.expanduser("~/Pictures/wallpapers"),
+    exclude: Annotated[str, typer.Option(help="Regex of keywords to exclude (if source=reddit)")] = r"dump|32:9|ai|vehicles|anime|meme|gaming|abstract",
     force: Annotated[bool, typer.Option("--force", "-f", help="Force download even if already downloaded today")] = False
 ):
     """
-    Automatically fetch and set the top wallpaper from a subreddit.
+    Automatically fetch and set the top wallpaper from Wallhaven or Reddit.
     """
     setup_directory(directory)
     
@@ -202,73 +212,134 @@ def fetch(
         set_wallpaper_hyprland(current_file)
         return
 
-    posts = get_reddit_posts(subreddit)
-    exclude_pattern = re.compile(exclude, re.IGNORECASE)
+    url = None
+    if source == "wallhaven":
+        wh = Wallhaven()
+        wh.params["sorting"] = sorting
+        if sorting == "toplist":
+            wh.params["topRange"] = top_range
+        wh.params["categories"] = categories
+        wh.params["purity"] = purity
+        wh.params["order"] = order
+        if ratio:
+            wh.params["ratios"] = ratio
 
-    for post in posts:
-        post_data = post.get("data", {})
-        title = post_data.get("title", "").lower()
-        flair = (post_data.get("link_flair_text") or "").lower()
+        results = wh.search()
+        if results.data:
+            url = results.data[0].path
+    else:
+        posts = get_reddit_posts(subreddit)
+        exclude_pattern = re.compile(exclude, re.IGNORECASE)
 
-        if exclude_pattern.search(title) or (flair and exclude_pattern.search(flair)):
-            continue
+        for post in posts:
+            post_data = post.get("data", {})
+            title = post_data.get("title", "").lower()
+            flair = (post_data.get("link_flair_text") or "").lower()
 
-        url = get_image_url_from_post(post_data)
-        if url:
-            date_file_placeholder = os.path.join(directory, f"{today}.jpg")
-            downloaded_path = download_file(url, date_file_placeholder)
-            if downloaded_path:
-                ext = os.path.splitext(downloaded_path)[1]
-                # Clean up old current files
-                for old_ext in [".jpg", ".png"]:
-                    try: os.remove(current_file_base + old_ext)
-                    except FileNotFoundError: pass
-                
-                new_current = current_file_base + ext
-                shutil.copy2(downloaded_path, new_current)
-                set_wallpaper_hyprland(new_current)
-                return
+            if exclude_pattern.search(title) or (flair and exclude_pattern.search(flair)):
+                continue
+
+            url = get_image_url_from_reddit_post(post_data)
+            if url:
+                break
+
+    if url:
+        date_file_placeholder = os.path.join(directory, f"{today}.jpg")
+        downloaded_path = download_file(url, date_file_placeholder)
+        if downloaded_path:
+            ext = os.path.splitext(downloaded_path)[1]
+            # Clean up old current files
+            for old_ext in [".jpg", ".png"]:
+                try: os.remove(current_file_base + old_ext)
+                except FileNotFoundError: pass
+            
+            new_current = current_file_base + ext
+            shutil.copy2(downloaded_path, new_current)
+            set_wallpaper_hyprland(new_current)
+            return
 
     typer.echo(":: Error: No suitable wallpaper found.", err=True)
     raise typer.Exit(code=1)
 
 @app.command()
 def select(
-    subreddit: Annotated[str, typer.Option(help="Subreddit to fetch from")] = "WidescreenWallpaper",
-    directory: Annotated[str, typer.Option(help="Directory to save wallpapers")] = os.path.expanduser("~/Pictures/reddit_wallpaper"),
-    exclude: Annotated[str, typer.Option(help="Regex of keywords to exclude")] = r"dump|32:9|ai|vehicles|anime|meme|gaming|abstract",
+    source: Annotated[str, typer.Option(help="Source to fetch from (wallhaven, reddit)")] = "wallhaven",
+    subreddit: Annotated[str, typer.Option(help="Subreddit to fetch from (if source=reddit)")] = "WidescreenWallpaper",
+    sorting: Annotated[str, typer.Option(help="Sorting criteria")] = "favorites",
+    top_range: Annotated[str, typer.Option(help="Range for toplist")] = "1M",
+    categories: Annotated[str, typer.Option(help="Categories")] = "100",
+    purity: Annotated[str, typer.Option(help="Purity bitfield")] = "100",
+    ratio: Annotated[str, typer.Option(help="Aspect ratio (if source=wallhaven, e.g. 21x9)")] = "21x9",
+    order: Annotated[str, typer.Option(help="Sort order")] = "desc",
+    directory: Annotated[str, typer.Option(help="Directory to save wallpapers")] = os.path.expanduser("~/Pictures/wallpapers"),
+    exclude: Annotated[str, typer.Option(help="Regex of keywords to exclude (if source=reddit)")] = r"dump|32:9|ai|vehicles|anime|meme|gaming|abstract",
 ):
+    """
+    Select a wallpaper from Wallhaven or Reddit via Rofi.
+    """
     setup_directory(directory)
     cache_dir = os.path.join(directory, ".cache")
     os.makedirs(cache_dir, exist_ok=True)
 
-    posts = get_reddit_posts(subreddit, limit=30)
-    exclude_pattern = re.compile(exclude, re.IGNORECASE)
+    valid_items = []
+    if source == "wallhaven":
+        wh = Wallhaven()
+        wh.params["sorting"] = sorting
+        if sorting == "toplist":
+            wh.params["topRange"] = top_range
+        wh.params["categories"] = categories
+        wh.params["purity"] = purity
+        wh.params["order"] = order
+        if ratio:
+            wh.params["ratios"] = ratio
 
-    valid_posts = []
-    for post in posts:
-        data = post.get("data", {})
-        title = data.get("title", "")
-        flair = (data.get("link_flair_text") or "")
-        if exclude_pattern.search(title) or (flair and exclude_pattern.search(flair)):
-            continue
-        url = get_image_url_from_post(data)
-        if url:
-            thumb_url = get_thumbnail_url(data) or url
-            post_id = data.get("id")
-            thumb_path = os.path.join(cache_dir, f"{post_id}.jpg")
-            valid_posts.append({"title": title, "url": url, "thumb_url": thumb_url, "id": post_id, "thumb_path": thumb_path})
+        results = wh.search()
+        for wallpaper in results.data:
+            url = wallpaper.path
+            thumb_url = wallpaper.thumbs.get("large") or wallpaper.thumbs.get("small") or url
+            item_id = wallpaper.id
+            title = f"ID: {item_id} ({wallpaper.resolution})"
+            thumb_path = os.path.join(cache_dir, f"{item_id}.jpg")
+            valid_items.append({
+                "title": title, 
+                "url": url, 
+                "thumb_url": thumb_url, 
+                "id": item_id, 
+                "thumb_path": thumb_path
+            })
+    else:
+        posts = get_reddit_posts(subreddit, limit=30)
+        exclude_pattern = re.compile(exclude, re.IGNORECASE)
 
-    if not valid_posts:
-        typer.echo(":: Error: No valid posts found.", err=True)
+        for post in posts:
+            data = post.get("data", {})
+            title = data.get("title", "")
+            flair = (data.get("link_flair_text") or "")
+            if exclude_pattern.search(title) or (flair and exclude_pattern.search(flair)):
+                continue
+            url = get_image_url_from_reddit_post(data)
+            if url:
+                thumb_url = get_thumbnail_url_from_reddit_post(data) or url
+                item_id = data.get("id")
+                thumb_path = os.path.join(cache_dir, f"{item_id}.jpg")
+                valid_items.append({
+                    "title": title, 
+                    "url": url, 
+                    "thumb_url": thumb_url, 
+                    "id": item_id, 
+                    "thumb_path": thumb_path
+                })
+
+    if not valid_items:
+        typer.echo(":: Error: No wallpapers found.", err=True)
         return
 
-    typer.echo(":: Fetching previews...")
+    typer.echo(f":: Fetching previews from {source}...")
     with ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(lambda p: download_file(p["thumb_url"], p["thumb_path"]), valid_posts)
+        executor.map(lambda p: download_file(p["thumb_url"], p["thumb_path"]), valid_items)
 
     menu_entries = []
-    for p in valid_posts:
+    for p in valid_items:
         icon_path = None
         for ext in [".jpg", ".png"]:
             p_path = os.path.join(cache_dir, f"{p['id']}{ext}")
@@ -282,19 +353,19 @@ def select(
             menu_entries.append(p["title"])
 
     rofi_process = subprocess.run(
-        ["rofi", "-dmenu", "-i", "-p", f"Select from r/{subreddit}", "-show-icons", "-theme-str", ROFI_PREVIEW_THEME],
+        ["rofi", "-dmenu", "-i", "-p", f"Select from {source}", "-show-icons", "-theme-str", ROFI_PREVIEW_THEME],
         input="\n".join(menu_entries), text=True, capture_output=True
     )
 
     selected_line = rofi_process.stdout.strip()
     if not selected_line: return
-    selected_post = next((p for p in valid_posts if p["title"] == selected_line), None)
-    if not selected_post: return
+    selected_wp = next((p for p in valid_items if p["title"] == selected_line), None)
+    if not selected_wp: return
 
-    filename_base = f"{datetime.date.today().strftime('%Y-%m-%d')}_{selected_post['id']}"
+    filename_base = f"{datetime.date.today().strftime('%Y-%m-%d')}_{selected_wp['id']}"
     current_file_base = os.path.join(directory, "current")
     
-    downloaded_path = download_file(selected_post["url"], os.path.join(directory, filename_base + ".jpg"))
+    downloaded_path = download_file(selected_wp["url"], os.path.join(directory, filename_base + ".jpg"))
     if downloaded_path:
         ext = os.path.splitext(downloaded_path)[1]
         for old_ext in [".jpg", ".png"]:
@@ -306,8 +377,11 @@ def select(
 
 @app.command()
 def local(
-    directory: Annotated[str, typer.Option(help="Directory to pick wallpapers from")] = os.path.expanduser("~/Pictures/reddit_wallpaper"),
+    directory: Annotated[str, typer.Option(help="Directory to pick wallpapers from")] = os.path.expanduser("~/Pictures/wallpapers"),
 ):
+    """
+    Select a locally stored wallpaper via Rofi.
+    """
     wallpaper_dir = Path(directory)
     if not wallpaper_dir.exists():
         typer.echo(f":: Error: Directory {directory} does not exist.", err=True)
