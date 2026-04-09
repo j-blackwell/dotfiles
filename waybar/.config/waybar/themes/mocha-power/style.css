@@ -82,6 +82,7 @@
 #waybar.main #keyboard-state,
 #waybar.main #network,
 #waybar.main #custom-bandwidth,
+#waybar.main #custom-sysusage,
 #waybar.main #battery,
 #waybar.main #backlight,
 #waybar.main #clock,
@@ -117,6 +118,7 @@
 
 /* Module colors */
 #waybar.main #cpu,
+#waybar.main #custom-sysusage,
 #waybar.main #temperature,
 #waybar.main #memory,
 #waybar.main #memory.ram,

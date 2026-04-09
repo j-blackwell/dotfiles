@@ -41,9 +41,7 @@
             "custom/spacer-bg1",
             "temperature",
             "custom/spacer-bg1",
-            "cpu",
-            "custom/spacer-bg1",
-            "memory",
+            "custom/sysusage",
             "custom/spacer-bg1",
             "custom/bandwidth",
             "custom/spacer2",
@@ -63,27 +61,6 @@
             "custom/spacer-bg2",
             "clock"
         ],
-
-        "custom/timer": {
-            "exec": "~/.local/bin/custom/timer.sh",
-            "return-type": "json",
-            "format": "{}",
-            "on-click": "~/.local/bin/custom/timer.sh toggle",
-            "on-click-right": "~/.local/bin/custom/timer.sh reset",
-            "on-scroll-up": "~/.local/bin/custom/timer.sh add",
-            "on-scroll-down": "~/.local/bin/custom/timer.sh sub",
-            "interval": 1,
-            "tooltip": true
-        },
-
-
-        "custom/weather": {
-            "format": "{}°",
-            "tooltip": true,
-            "interval": 60,
-            "exec": "wttrbar --nerd --location Ealing",
-            "return-type": "json"
-        },
 
         "group/traym": {
             "orientation": "horizontal",
@@ -105,14 +82,6 @@
             "default-submap": "",
             "format": "{}",
             "format-RESIZE": "{}lol",
-            "tooltip": false
-        },
-
-        "temperature": {
-            "critical-threshold": 90,
-            "interval": 4,
-            "format": "{icon} {temperatureC}°",
-            "format-icons": ["", "", "", "", ""],
             "tooltip": false
         },
 

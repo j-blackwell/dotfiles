@@ -88,6 +88,26 @@
     "on-click": "xdg-open https://calendar.google.com/calendar/u/0/r/week?pli=1"
   },
 
+  "custom/timer": {
+    "exec": "~/.local/bin/custom/timer.sh",
+    "return-type": "json",
+    "format": "{}",
+    "on-click": "~/.local/bin/custom/timer.sh toggle",
+    "on-click-right": "~/.local/bin/custom/timer.sh reset",
+    "on-scroll-up": "~/.local/bin/custom/timer.sh add",
+    "on-scroll-down": "~/.local/bin/custom/timer.sh sub",
+    "interval": 1,
+    "tooltip": true
+  },
+
+  "custom/weather": {
+    "format": "{}°",
+    "tooltip": true,
+    "interval": 60,
+    "exec": "wttrbar --nerd --location Ealing",
+    "return-type": "json"
+  },
+
   "clock": {
     "format": "{:%Y-%m-%d %H:%M:%S}",
     "tooltip-format": "{:%A\n%Y-%m-%d}",
@@ -106,6 +126,23 @@
     "format": " {}%",
     "on-click": "~/.config/hypr/settings/system-monitor.sh",
     "min-length": 5
+  },
+
+  "custom/sysusage": {
+    "format": "{}",
+    "interval": 2,
+    "exec": "~/.local/bin/custom/sys-usage.sh",
+    "return-type": "json",
+    "on-click": "~/.config/hypr/settings/system-monitor.sh"
+  },
+
+  "temperature": {
+    "critical-threshold": 90,
+    "interval": 4,
+    "format": "{icon}",
+    "format-icons": ["", "", "", "", ""],
+    "tooltip": true,
+    "tooltip-format": "{temperatureC}°C"
   },
 
   "hyprland/language": {

@@ -46,33 +46,24 @@ IF_INFO=$(nmcli -t -f DEVICE,TYPE,STATE dev | grep "^$INTERFACE")
 TYPE=$(echo "$IF_INFO" | cut -d: -f2)
 
 if [[ "$TYPE" == "wifi" ]]; then
-	ICON=""
 	WIFI_INFO=$(nmcli -t -f IN-USE,SSID,SIGNAL,BARS,FREQ dev wifi | grep '^\*')
 	ESSID=$(echo "$WIFI_INFO" | cut -d: -f2)
 	SIGNAL=$(echo "$WIFI_INFO" | cut -d: -f3)
 	FREQ=$(echo "$WIFI_INFO" | cut -d: -f5)
 	TOOLTIP="$ICON  $INTERFACE @ $ESSID\nIP: $IP\nStrength: $SIGNAL%\nFreq: $FREQ\nUp: $UP_BITS\nDown: $DOWN_BITS"
 else
-	ICON=""
 	TOOLTIP="$ICON $INTERFACE\nIP: $IP\n up: $UP_BITS down: $DOWN_BITS"
 fi
 
-# Calculate log scale bar
+# Calculate bandwidth level (0-4)
 # Ratio = log(speed+1) / log(max+1)
 RATIO=$(awk "BEGIN { r = log($RX_SPEED+1)/log($MAX_SPEED+1); if(r>1)r=1; print r }")
-FILL_COUNT=$(awk "BEGIN { print int($RATIO * $BAR_WIDTH + 0.5) }")
+LEVEL=$(awk "BEGIN { print int($RATIO * 4 + 0.5) }")
 
-BAR=""
-ICON_FULL="▰"
-ICON_EMPTY="▱"
-
-for ((i = 1; i <= BAR_WIDTH; i++)); do
-	if [ $i -le "$FILL_COUNT" ]; then
-		BAR="${BAR}$ICON_FULL"
-	else
-		BAR="${BAR}$ICON_EMPTY"
-	fi
-done
+# Map level to Nerd Font wifi-strength icons
+# 0: 󰤯, 1: 󰤟, 2: 󰤢, 3: 󰤥, 4: 󰤨
+ICONS=("󰤯" "󰤟" "󰤢" "󰤥" "󰤨")
+STRENGTH_ICON=${ICONS[$LEVEL]}
 
 # Output JSON
-echo "{\"text\": \"$ICON $BAR\", \"tooltip\": \"$TOOLTIP\"}"
+echo "{\"text\": \"$STRENGTH_ICON\", \"tooltip\": \"$TOOLTIP\"}"

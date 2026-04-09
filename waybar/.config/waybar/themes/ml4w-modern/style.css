@@ -322,7 +322,7 @@ window#waybar.empty #window {
  * Hardware Group
  * ----------------------------------------------------- */
 
-#disk,#memory,#cpu,#language {
+#disk,#memory,#cpu,#custom-sysusage,#language {
     margin:0px;
     padding:0px;
     font-size:16px;
@@ -486,7 +486,7 @@ window#waybar.empty #window {
  * CPU / Memory / keyboard
  * ----------------------------------------------------- */
 
-#cpu,#memory,#language {
+#cpu,#memory,#custom-sysusage,#language {
     background-color: @backgroundlight;
     font-size: 16px;
     color: @textcolor2;
