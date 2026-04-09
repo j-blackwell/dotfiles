@@ -48,11 +48,18 @@ return {
 
 			-- [[ Configure Telescope ]]
 			-- See `:help telescope` and `:help telescope.setup()`
+			local vimgrep_arguments = { unpack(require("telescope.config").values.vimgrep_arguments) }
+			table.insert(vimgrep_arguments, "--hidden")
+			table.insert(vimgrep_arguments, "--glob")
+			table.insert(vimgrep_arguments, "!.git/*")
+
 			require("telescope").setup({
 				-- You can put your default mappings / updates / etc. in here
 				--  All the info you're looking for is in `:help telescope.setup()`
 				--
 				defaults = {
+					vimgrep_arguments = vimgrep_arguments,
+					hidden = true,
 					mappings = {
 						i = {
 							["<CR>"] = function(prompt_bufnr)

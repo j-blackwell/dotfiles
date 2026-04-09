@@ -6,66 +6,21 @@ return {
 				"<leader>sf",
 				function()
 					require("telescope.builtin").find_files({
-						prompt_title = "Find Files (Deprioritize Tests)",
-						cwd = vim.fn.getcwd(),
-						find_command = {
-							"rg",
-							"--files",
-							"--sort",
-							"path", -- Ensures a natural ordering (alphabetical, depth-based)
-						},
-						file_ignore_patterns = { "^tests/" }, -- Soft-ignore tests (pushed to the bottom)
-					})
-				end,
-				desc = "[S]earch [F]iles",
-			},
-			{
-				"<leader>fd",
-				function()
-					require("telescope.builtin").find_files({
-						prompt_title = "Search for dotfiles or .config files",
+						prompt_title = "Find Files (Including Hidden)",
 						cwd = vim.fn.getcwd(),
 						find_command = {
 							"rg",
 							"--files",
 							"--hidden",
-							"--no-ignore",
 							"--glob",
-							".*", -- Include dotfiles
-							"--glob",
-							"**/.*/**", -- Include .config directories
-							"--glob",
-							"!.git/*", -- Exclude .git directory
+							"!.git/*",
+							"--sort",
+							"path",
 						},
+						file_ignore_patterns = { "^tests/" }, -- Soft-ignore tests (pushed to the bottom)
 					})
 				end,
-				desc = "[F]ind [d]otfiles or .config files",
-			},
-			{
-				"<leader>sG",
-				function()
-					local telescope = require("telescope.builtin")
-					local vimgrep_arguments = { unpack(require("telescope.config").values.vimgrep_arguments) }
-
-					-- Add extra arguments for hidden files & dot directories
-					vim.list_extend(vimgrep_arguments, {
-						"--hidden",
-						"--no-ignore",
-						"--glob",
-						"!.git/*", -- Exclude .git directory
-						"--glob",
-						".*", -- Include dotfiles
-						"--glob",
-						"**/.*/**", -- Include files inside hidden directories
-					})
-
-					telescope.live_grep({
-						prompt_title = "Grep in dotfiles & hidden directories",
-						cwd = vim.fn.getcwd(),
-						vimgrep_arguments = vimgrep_arguments,
-					})
-				end,
-				desc = "[s]earch using [G]rep in dotfiles or .config files",
+				desc = "[S]earch [F]iles",
 			},
 			{
 				"<leader>ft",
