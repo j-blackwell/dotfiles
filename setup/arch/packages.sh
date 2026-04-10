@@ -4,6 +4,8 @@
 CORE_PKGS=(
 	"reflector" "pacman-contrib" "ripgrep" "fd" "btop" "jq"
 	"alsa-utils" "playerctl" "ldns" "ufw" "upower"
+	"fzf" "zoxide" "ffmpeg" "7zip" "poppler" "resvg" "imagemagick"
+	"trash-cli"
 )
 
 # Desktop (Wayland/Hyprland)
@@ -25,6 +27,7 @@ DEV_PKGS=(
 APP_PKGS=(
 	"firefox" "kitty" "nautilus" "gimp" "obsidian"
 	"syncthing" "libreoffice-fresh" "mpv" "timeshift"
+	"yazi"
 )
 
 # Fonts

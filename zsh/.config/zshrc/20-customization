@@ -31,6 +31,11 @@ source $ZSH/oh-my-zsh.sh
 # -----------------------------------------------------
 source <(fzf --zsh)
 
+# -----------------------------------------------------
+# Set-up Zoxide (Smart cd)
+# -----------------------------------------------------
+eval "$(zoxide init zsh)"
+
 # zsh history
 HISTFILE=~/.zsh_history
 HISTSIZE=10000

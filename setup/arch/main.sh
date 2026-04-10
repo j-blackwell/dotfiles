@@ -14,4 +14,10 @@ bash "$SETUPSCRIPT_DIR/system.sh"
 # Run stow
 bash "$SETUPSCRIPT_DIR/stow.sh"
 
+# Post-stow: Yazi package installation
+if command -v ya &>/dev/null; then
+	echo ":: Installing Yazi packages..."
+	ya pkg install
+fi
+
 echo ":: Setup complete! Please restart your session."
