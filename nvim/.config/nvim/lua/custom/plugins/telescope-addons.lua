@@ -332,6 +332,91 @@ return {
 						:find()
 				end,
 			},
+			{
+				"<leader>cdu",
+				desc = "[C]ode [D]agster [U]pstream",
+				function()
+					local pickers = require("telescope.pickers")
+					local finders = require("telescope.finders")
+					local conf = require("telescope.config").values
+
+					-- Get the symbol under cursor
+					local symbol = vim.fn.expand("<cword>")
+
+					if not symbol or symbol == "" then
+						print("No symbol under cursor")
+						return
+					end
+
+					-- Regex pattern for ripgrep to find function definitions with the symbol as an argument
+					local pattern = [[\b(def|function|func|fn)\s+([\w_.:]+)\s*\([^)]*\b]] .. symbol .. [[\b[^)]*\)]]
+
+					-- Find all function definition locations containing the symbol as an argument
+					local cmd = "rg --pcre2 --with-filename --line-number --no-heading --only-matching --replace '$2' -U '"
+						.. pattern
+						.. "' "
+						.. vim.fn.getcwd()
+
+					local handle = io.popen(cmd)
+					local result = handle:read("*a")
+					handle:close()
+
+					if not result or result == "" then
+						print("No functions found with argument: " .. symbol)
+						return
+					end
+
+					local entries = {}
+
+					for line in result:gmatch("[^\r\n]+") do
+						-- Parse: filename:line_number:function_name (e.g. setup_directory)
+						local filename, lnum, func_name = line:match("^([^:]+):(%d+):(.+)$")
+
+						if filename and lnum and func_name then
+							table.insert(entries, {
+								filename = filename,
+								lnum = tonumber(lnum),
+								col = 1,
+								text = func_name,
+							})
+						end
+					end
+
+					if #entries == 0 then
+						print("No functions extracted")
+						return
+					end
+
+					pickers
+						.new({}, {
+							prompt_title = "Functions with argument: " .. symbol,
+							finder = finders.new_table({
+								results = entries,
+								entry_maker = function(entry)
+									-- Extract the last part of the parent directory and the filename
+									local parent_dir = vim.fn.fnamemodify(entry.filename, ":h:t")
+									local filename_tail = vim.fn.fnamemodify(entry.filename, ":t")
+									local path_display = filename_tail
+									if parent_dir ~= "" and parent_dir ~= "." then
+										path_display = parent_dir .. "/" .. filename_tail
+									end
+
+									return {
+										value = entry,
+										display = "[" .. path_display .. "] " .. entry.text,
+										ordinal = path_display .. " " .. entry.text,
+										filename = entry.filename,
+										lnum = entry.lnum,
+										col = entry.col,
+									}
+								end,
+							}),
+							sorter = conf.generic_sorter({}),
+							previewer = conf.grep_previewer({}),
+						})
+						:find()
+				end,
+			},
 		},
 	},
 	{
