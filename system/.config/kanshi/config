@@ -1,9 +1,0 @@
-profile docked {
-    output DP-2 enable mode 3440x1440
-    output eDP-1 disable
-}
-
-profile undocked {
-    output eDP-1 enable mode 1920x1080 position 0,0
-    exec hyprctl keyword monitor eDP-1,preferred,auto,1
-}

@@ -12,7 +12,7 @@ CORE_PKGS=(
 GUI_PKGS=(
 	"hyprland" "hyprpaper" "hyprlock" "hypridle" "hyprshade"
 	"waybar" "swaync" "waypaper" "wlogout" "grim" "slurp"
-	"swappy" "wl-clipboard" "kanshi" "nwg-dock-hyprland"
+	"swappy" "wl-clipboard" "nwg-dock-hyprland"
 	"rofi-wayland" "rofi-emoji" "qt6ct" "calibre"
 )
 
