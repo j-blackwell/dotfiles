@@ -4,6 +4,10 @@ print("Creating `new_obj()`")
 new_obj = type("", (), {})
 
 with suppress(ImportError):
+    from dotenv import load_dotenv
+    load_dotenv()
+
+with suppress(ImportError):
     print("Importing `wat`")
     import wat
 
