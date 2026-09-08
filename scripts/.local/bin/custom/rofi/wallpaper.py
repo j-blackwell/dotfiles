@@ -183,8 +183,8 @@ def set_wallpaper_hyprland(file_path: str):
 def fetch(
     source: Annotated[str, typer.Option(help="Source to fetch from (wallhaven, reddit)")] = "wallhaven",
     subreddit: Annotated[str, typer.Option(help="Subreddit to fetch from (if source=reddit)")] = "WidescreenWallpaper",
-    sorting: Annotated[str, typer.Option(help="Sorting criteria (date_added, relevance, random, views, favorites, toplist)")] = "favorites",
-    top_range: Annotated[str, typer.Option(help="Range for toplist (1d, 1w, 1M, 3M, 6M, 1y)")] = "1M",
+    sorting: Annotated[str, typer.Option(help="Sorting criteria (date_added, relevance, random, views, favorites, toplist)")] = "toplist",
+    top_range: Annotated[str, typer.Option(help="Range for toplist (1d, 1w, 1M, 3M, 6M, 1y)")] = "1w",
     categories: Annotated[str, typer.Option(help="Categories (general, anime, people) as binary (e.g. 110)")] = "100",
     purity: Annotated[str, typer.Option(help="Purity bitfield (SFW, Sketchy, NSFW) as binary (e.g. 100)")] = "100",
     ratio: Annotated[str, typer.Option(help="Aspect ratio (if source=wallhaven, e.g. 21x9)")] = "21x9",
@@ -265,8 +265,8 @@ def fetch(
 def select(
     source: Annotated[str, typer.Option(help="Source to fetch from (wallhaven, reddit)")] = "wallhaven",
     subreddit: Annotated[str, typer.Option(help="Subreddit to fetch from (if source=reddit)")] = "WidescreenWallpaper",
-    sorting: Annotated[str, typer.Option(help="Sorting criteria")] = "favorites",
-    top_range: Annotated[str, typer.Option(help="Range for toplist")] = "1M",
+    sorting: Annotated[str, typer.Option(help="Sorting criteria")] = "toplist",
+    top_range: Annotated[str, typer.Option(help="Range for toplist")] = "1w",
     categories: Annotated[str, typer.Option(help="Categories")] = "100",
     purity: Annotated[str, typer.Option(help="Purity bitfield")] = "100",
     ratio: Annotated[str, typer.Option(help="Aspect ratio (if source=wallhaven, e.g. 21x9)")] = "21x9",
