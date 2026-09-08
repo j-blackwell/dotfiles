@@ -14,10 +14,10 @@
 -- -----------------------------------------------------
 -- eDP-1 is managed dynamically below (docked/undocked handling), not declared statically here.
 hl.monitor({
-    output = "",
-    mode = "preferred",
-    position = "auto",
-    scale = "1",
+	output = "",
+	mode = "preferred",
+	position = "auto",
+	scale = "1",
 })
 
 -- -----------------------------------------------------
@@ -65,133 +65,133 @@ hl.curve("md3_accel", { type = "bezier", points = { { 0.3, 0 }, { 0.8, 0.15 } } 
 hl.curve("menu_decel", { type = "bezier", points = { { 0.1, 1 }, { 0, 1 } } })
 hl.curve("menu_accel", { type = "bezier", points = { { 0.38, 0.04 }, { 1, 0.07 } } })
 hl.animation({
-    leaf = "windows",
-    enabled = true,
-    speed = 3,
-    bezier = "md3_decel",
-    style = "popin 60%",
+	leaf = "windows",
+	enabled = true,
+	speed = 3,
+	bezier = "md3_decel",
+	style = "popin 60%",
 })
 hl.animation({
-    leaf = "windowsIn",
-    enabled = true,
-    speed = 3,
-    bezier = "md3_decel",
-    style = "popin 60%",
+	leaf = "windowsIn",
+	enabled = true,
+	speed = 3,
+	bezier = "md3_decel",
+	style = "popin 60%",
 })
 hl.animation({
-    leaf = "windowsOut",
-    enabled = true,
-    speed = 3,
-    bezier = "md3_accel",
-    style = "popin 60%",
+	leaf = "windowsOut",
+	enabled = true,
+	speed = 3,
+	bezier = "md3_accel",
+	style = "popin 60%",
 })
 hl.animation({
-    leaf = "border",
-    enabled = true,
-    speed = 10,
-    bezier = "default",
+	leaf = "border",
+	enabled = true,
+	speed = 10,
+	bezier = "default",
 })
 hl.animation({
-    leaf = "fade",
-    enabled = true,
-    speed = 3,
-    bezier = "md3_decel",
+	leaf = "fade",
+	enabled = true,
+	speed = 3,
+	bezier = "md3_decel",
 })
 hl.animation({
-    leaf = "layersIn",
-    enabled = true,
-    speed = 3,
-    bezier = "menu_decel",
-    style = "slide",
+	leaf = "layersIn",
+	enabled = true,
+	speed = 3,
+	bezier = "menu_decel",
+	style = "slide",
 })
 hl.animation({
-    leaf = "layersOut",
-    enabled = true,
-    speed = 1.6,
-    bezier = "menu_accel",
+	leaf = "layersOut",
+	enabled = true,
+	speed = 1.6,
+	bezier = "menu_accel",
 })
 hl.animation({
-    leaf = "workspaces",
-    enabled = true,
-    speed = 7,
-    bezier = "menu_decel",
-    style = "slide",
+	leaf = "workspaces",
+	enabled = true,
+	speed = 7,
+	bezier = "menu_decel",
+	style = "slide",
 })
 
 hl.window_rule({
-    match = {
-        title = "^(pavucontrol)$",
-    },
-    float = true,
+	match = {
+		title = "^(pavucontrol)$",
+	},
+	float = true,
 })
 
 hl.window_rule({
-    match = {
-        title = "^(blueman-manager)$",
-    },
-    float = true,
+	match = {
+		title = "^(blueman-manager)$",
+	},
+	float = true,
 })
 
 hl.window_rule({
-    match = {
-        title = "^(nm-connection-editor)$",
-    },
-    float = true,
+	match = {
+		title = "^(nm-connection-editor)$",
+	},
+	float = true,
 })
 
 hl.window_rule({
-    match = {
-        title = "^(qalculate-gtk)$",
-    },
-    float = true,
+	match = {
+		title = "^(qalculate-gtk)$",
+	},
+	float = true,
 })
 
 hl.window_rule({
-    match = {
-        title = "^(Picture-in-Picture)$",
-    },
-    float = true,
-    pin = true,
-    move = "69.5% 4%",
+	match = {
+		title = "^(Picture-in-Picture)$",
+	},
+	float = true,
+	pin = true,
+	move = "69.5% 4%",
 })
 
 hl.window_rule({
-    match = {
-        class = "(.*waypaper.*)",
-    },
-    float = true,
-    size = "900 700",
-    center = true,
+	match = {
+		class = "(.*waypaper.*)",
+	},
+	float = true,
+	size = "900 700",
+	center = true,
 })
 
 hl.window_rule({
-    match = {
-        class = ".*",
-    },
-    focus_on_activate = true,
+	match = {
+		class = ".*",
+	},
+	focus_on_activate = true,
 })
 
 hl.window_rule({
-    match = {
-        class = "^(zoom)$",
-    },
-    no_anim = true,
-    no_shadow = true,
-    float = true,
+	match = {
+		class = "^(zoom)$",
+	},
+	no_anim = true,
+	no_shadow = true,
+	float = true,
 })
 
 hl.window_rule({
-    match = {
-        title = "^(zoom)$",
-    },
-    float = true,
+	match = {
+		title = "^(zoom)$",
+	},
+	float = true,
 })
 
 hl.window_rule({
-    match = {
-        title = "^(as_toolbar)$",
-    },
-    float = true,
+	match = {
+		title = "^(as_toolbar)$",
+	},
+	float = true,
 })
 
 local mainMod = "SUPER"
@@ -223,24 +223,162 @@ hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.resize({ x = 0, y = 100, relati
 
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("~/.local/bin/custom/bt-connect-speaker.sh"))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("~/.local/bin/uv run ~/.local/bin/custom/rofi/code_project.py"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_area.py swappy"))
-hl.bind(mainMod .. " + CTRL + S", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_area.py copy"))
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_text.py"))
+hl.bind(
+	mainMod .. " + SHIFT + S",
+	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_area.py swappy")
+)
+hl.bind(
+	mainMod .. " + CTRL + S",
+	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_area.py copy")
+)
+hl.bind(
+	mainMod .. " + SHIFT + T",
+	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_text.py")
+)
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_full.py"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/specific_code_project.py ~/code/ember-data-processing"))
-hl.bind(mainMod .. " + PERIOD", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/emoji_picker.py"))
+hl.bind(
+	mainMod .. " + D",
+	hl.dsp.exec_cmd(
+		"~/.local/bin/uv run --script ~/.local/bin/custom/rofi/specific_code_project.py ~/code/ember-data-processing"
+	)
+)
+hl.bind(
+	mainMod .. " + PERIOD",
+	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/emoji_picker.py")
+)
 hl.bind(mainMod .. " + ESCAPE", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/power.py"))
 hl.bind(mainMod .. " + SHIFT + D", hl.dsp.exec_cmd("~/.local/bin/custom/rofi/port_opener.sh"))
-hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("sh -c \"xdg-open \\\"$(wl-paste)\\\"\""))
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("~/.local/bin/custom/group.sh"))
+hl.bind(mainMod .. " + O", hl.dsp.exec_cmd('sh -c "xdg-open \\"$(wl-paste)\\""'))
+-- A dispatched focus change doesn't necessarily take effect before the next
+-- hl.dispatch() call in the same tick, so every focus -> act step below is
+-- sequenced through a short oneshot timer instead of running back-to-back.
+local FOCUS_SETTLE = { timeout = 50, type = "oneshot" }
+
+local function toggle_group_workspace()
+	local windows = hl.get_workspace_windows("active")
+
+	local any_grouped = false
+	local addrs = {}
+	for _, w in pairs(windows) do
+		table.insert(addrs, w.address)
+		if w.grouped and #w.grouped > 0 then
+			any_grouped = true
+		end
+	end
+
+	if any_grouped then
+		-- One representative address per distinct group present
+		local handled = {}
+		local reps = {}
+		for _, w in pairs(windows) do
+			if w.grouped and #w.grouped > 0 and not handled[w.address] then
+				table.insert(reps, w.address)
+				for _, mate in pairs(w.grouped) do
+					handled[mate] = true
+				end
+			end
+		end
+
+		local i = 1
+		local function ungroup_next()
+			if i > #reps then
+				return
+			end
+			local addr = reps[i]
+			i = i + 1
+			hl.dispatch(hl.dsp.focus({ window = addr }))
+			hl.timer(function()
+				hl.dispatch(hl.dsp.group.toggle())
+				ungroup_next()
+			end, FOCUS_SETTLE)
+		end
+		ungroup_next()
+		return
+	end
+
+	if #addrs < 2 then
+		return
+	end
+
+	-- Group every window on the workspace into a single group.
+	-- Merging changes the tiling layout, so a window that fails to merge on
+	-- one pass can become mergeable after others have joined -- keep
+	-- retrying the leftovers until a full pass makes no progress.
+	hl.dispatch(hl.dsp.focus({ window = addrs[1] }))
+	hl.timer(function()
+		hl.dispatch(hl.dsp.group.toggle())
+
+		local function try_merge(list, idx, retry_list, on_pass_done)
+			if idx > #list then
+				on_pass_done(retry_list)
+				return
+			end
+			local addr = list[idx]
+			hl.dispatch(hl.dsp.focus({ window = addr }))
+			hl.timer(function()
+				local dirs = { "l", "r", "u", "d" }
+				local di = 1
+				local function try_dir()
+					if di > #dirs then
+						table.insert(retry_list, addr)
+						try_merge(list, idx + 1, retry_list, on_pass_done)
+						return
+					end
+					local dir = dirs[di]
+					di = di + 1
+					local result = hl.dispatch(hl.dsp.group.move_window({ direction = dir }))
+					if result.ok then
+						try_merge(list, idx + 1, retry_list, on_pass_done)
+					else
+						try_dir()
+					end
+				end
+				try_dir()
+			end, FOCUS_SETTLE)
+		end
+
+		local function run_pass(list)
+			if #list == 0 then
+				return
+			end
+			try_merge(list, 1, {}, function(retry_list)
+				if #retry_list > 0 and #retry_list < #list then
+					run_pass(retry_list)
+				end
+			end)
+		end
+
+		local remaining = {}
+		for i = 2, #addrs do
+			table.insert(remaining, addrs[i])
+		end
+		run_pass(remaining)
+	end, FOCUS_SETTLE)
+end
+
+hl.bind(mainMod .. " + M", toggle_group_workspace)
 hl.bind(mainMod .. " + CTRL + R", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("~/.local/bin/custom/cliphist.sh"))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd("~/.config/waybar/launch.sh"))
 hl.bind(mainMod .. " + CTRL + B", hl.dsp.exec_cmd("~/.config/waybar/toggle.sh"))
-hl.bind(mainMod .. " + CTRL + W", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/wallpaper.py local"))
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/wallpaper.py select"))
-hl.bind(mainMod .. " + CTRL + T", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/waybar_theme.py"))
-hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("pkill hypridle && notify-send -a \"System\" -i \"caffeine-on\" \"Caffeine Mode\" \"Hypridle paused. System will stay awake.\" || (hypridle & notify-send -a \"System\" -i \"caffeine-off\" \"Normal Mode\" \"Hypridle started. Idle timers enabled.\")"))
+hl.bind(
+	mainMod .. " + CTRL + W",
+	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/wallpaper.py local")
+)
+hl.bind(
+	mainMod .. " + SHIFT + W",
+	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/wallpaper.py select")
+)
+hl.bind(
+	mainMod .. " + CTRL + T",
+	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/waybar_theme.py")
+)
+hl.bind(
+	mainMod .. " + I",
+	hl.dsp.exec_cmd(
+		'pkill hypridle && notify-send -a "System" -i "caffeine-on" "Caffeine Mode" "Hypridle paused. System will stay awake." || (hypridle & notify-send -a "System" -i "caffeine-off" "Normal Mode" "Hypridle started. Idle timers enabled.")'
+	)
+)
 
 hl.bind(mainMod .. " + 1", hl.dsp.focus({ workspace = 1 }))
 hl.bind(mainMod .. " + 2", hl.dsp.focus({ workspace = 2 }))
@@ -269,8 +407,16 @@ hl.bind(mainMod .. " + CTRL + SHIFT + Tab", hl.dsp.focus({ workspace = "m-1" }))
 
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -q s +10%"))
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -q s 10%-"))
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5%"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5%"), { locked = true, repeating = true })
+hl.bind(
+	"XF86AudioRaiseVolume",
+	hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ +5%"),
+	{ locked = true, repeating = true }
+)
+hl.bind(
+	"XF86AudioLowerVolume",
+	hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ 0 && pactl set-sink-volume @DEFAULT_SINK@ -5%"),
+	{ locked = true, repeating = true }
+)
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle"))
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("~/.local/bin/custom/mic-lock.sh toggle"))
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
@@ -283,179 +429,195 @@ hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 
 hl.layer_rule({
-    match = { namespace = "selection" },
-    blur = false,
+	match = { namespace = "selection" },
+	blur = false,
 })
 
 hl.layer_rule({
-    match = { namespace = "slurp" },
-    blur = false,
+	match = { namespace = "slurp" },
+	blur = false,
 })
 
 hl.window_rule({
-    match = {
-        class = "(dotfiles-floating)",
-    },
-    float = true,
-    size = "1000 700",
-    center = true,
+	match = {
+		class = "(dotfiles-floating)",
+	},
+	float = true,
+	size = "1000 700",
+	center = true,
 })
 
 hl.config({
-    input = {
-        kb_layout = "gb",
-        numlock_by_default = true,
-        follow_mouse = 1,
-        mouse_refocus = false,
-        sensitivity = 0,
-        touchpad = {
-            natural_scroll = true,
-            scroll_factor = 1.0,
-        },
-    },
-    -- -----------------------------------------------------
-    -- General
-    -- -----------------------------------------------------
-    general = {
-        gaps_in = 10,
-        gaps_out = 14,
-        border_size = 3,
-        col = {
-            active_border = color11,
-            inactive_border = color8,
-        },
-        layout = "dwindle",
-        resize_on_border = true,
-    },
-    -- -----------------------------------------------------
-    -- Decoration
-    -- -----------------------------------------------------
-    decoration = {
-        rounding = 10,
-        active_opacity = 1.0,
-        inactive_opacity = 0.9,
-        fullscreen_opacity = 1.0,
-        -- blur {
-        --     enabled = true
-        --     size = 6
-        --     passes = 2
-        --     new_optimizations = on
-        --     ignore_opacity = true
-        --     xray = true
-        -- }
-        shadow = {
-            enabled = true,
-            range = 30,
-            render_power = 3,
-            color = 0x66000000,
-        },
-    },
-    -- -----------------------------------------------------
-    -- Animations
-    -- -----------------------------------------------------
-    animations = {
-        enabled = true,
-    },
-    -- -----------------------------------------------------
-    -- Layouts
-    -- -----------------------------------------------------
-    dwindle = {
-        preserve_split = true,
-    },
-    misc = {
-        disable_hyprland_logo = true,
-        disable_splash_rendering = true,
-        initial_workspace_tracking = 1,
-    },
-    binds = {
-        workspace_back_and_forth = false,
-        allow_workspace_cycles = true,
-    },
-    -- -----------------------------------------------------
-    -- Window Rules
-    -- -----------------------------------------------------
-    -- Zoom: Disable animations, shadows and floating for toolbars
-    -- -----------------------------------------------------
-    -- Keybindings
-    -- -----------------------------------------------------
-    -- Core Applications
-    -- Window Management
-    -- Vim Motions (Focus)
-    -- Resizing
-    -- Custom Script Bindings (from dotfiles/scripts)
-    -- Actions from ML4W
-    -- Workspaces
-    -- Next/Previous Workspace
-    -- Fn keys
-    -- Mouse Bindings
-    -- Layer Rules
-    -- General floating
+	input = {
+		kb_layout = "gb",
+		numlock_by_default = true,
+		follow_mouse = 1,
+		mouse_refocus = false,
+		sensitivity = 0,
+		touchpad = {
+			natural_scroll = true,
+			scroll_factor = 1.0,
+		},
+	},
+	-- -----------------------------------------------------
+	-- General
+	-- -----------------------------------------------------
+	general = {
+		gaps_in = 10,
+		gaps_out = 14,
+		border_size = 3,
+		col = {
+			active_border = color11,
+			inactive_border = color8,
+		},
+		layout = "dwindle",
+		resize_on_border = true,
+	},
+	-- -----------------------------------------------------
+	-- Decoration
+	-- -----------------------------------------------------
+	decoration = {
+		rounding = 10,
+		active_opacity = 1.0,
+		inactive_opacity = 0.9,
+		fullscreen_opacity = 1.0,
+		-- blur {
+		--     enabled = true
+		--     size = 6
+		--     passes = 2
+		--     new_optimizations = on
+		--     ignore_opacity = true
+		--     xray = true
+		-- }
+		shadow = {
+			enabled = true,
+			range = 30,
+			render_power = 3,
+			color = 0x66000000,
+		},
+	},
+	-- -----------------------------------------------------
+	-- Animations
+	-- -----------------------------------------------------
+	animations = {
+		enabled = true,
+	},
+	-- -----------------------------------------------------
+	-- Layouts
+	-- -----------------------------------------------------
+	dwindle = {
+		preserve_split = true,
+	},
+	misc = {
+		disable_hyprland_logo = true,
+		disable_splash_rendering = true,
+		initial_workspace_tracking = 1,
+	},
+	binds = {
+		workspace_back_and_forth = false,
+		allow_workspace_cycles = true,
+	},
+	-- -----------------------------------------------------
+	-- Window Rules
+	-- -----------------------------------------------------
+	-- Zoom: Disable animations, shadows and floating for toolbars
+	-- -----------------------------------------------------
+	-- Keybindings
+	-- -----------------------------------------------------
+	-- Core Applications
+	-- Window Management
+	-- Vim Motions (Focus)
+	-- Resizing
+	-- Custom Script Bindings (from dotfiles/scripts)
+	-- Actions from ML4W
+	-- Workspaces
+	-- Next/Previous Workspace
+	-- Fn keys
+	-- Mouse Bindings
+	-- Layer Rules
+	-- General floating
 })
 
 -- -----------------------------------------------------
 -- Docked / undocked monitor handling
 -- -----------------------------------------------------
--- Replaces the old hypr_monitor_auto.py + kanshi setup: when the DP-2 dock
--- monitor is present, disable the laptop screen; otherwise use it normally.
 local function monitor_name(mon)
-    if type(mon) == "table" then
-        return mon.name
-    end
-    return mon
+	if type(mon) == "string" then
+		return mon
+	end
+	return mon.name
 end
 
-local function apply_docked()
-    hl.exec_cmd("hyprctl keyword monitor DP-2,3440x1440@100,0x0,1")
-    hl.exec_cmd("hyprctl keyword monitor eDP-1,disable")
+local function apply_docked(name)
+	hl.monitor({ output = name, mode = "preferred", position = "0x0", scale = "1" })
+	hl.monitor({ output = "eDP-1", disabled = true })
 end
 
 local function apply_undocked()
-    hl.exec_cmd("hyprctl keyword monitor eDP-1,preferred,auto,1")
+	hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = "1", disabled = false })
 end
 
-local function is_docked()
-    for _, mon in pairs(hl.get_monitors()) do
-        if monitor_name(mon) == "DP-2" then
-            return true
-        end
-    end
-    return false
+local function find_external_monitor()
+	for _, mon in pairs(hl.get_monitors()) do
+		local name = monitor_name(mon)
+		if name ~= "eDP-1" then
+			return name
+		end
+	end
+	return nil
 end
+
+local function check_dock_state()
+	local external = find_external_monitor()
+	if external then
+		apply_docked(external)
+	else
+		apply_undocked()
+	end
+end
+
+check_dock_state()
 
 hl.on("monitor.added", function(mon)
-    if monitor_name(mon) == "DP-2" then
-        apply_docked()
-    end
+	local name = monitor_name(mon)
+	if name ~= "eDP-1" then
+		apply_docked(name)
+	end
 end)
 
 hl.on("monitor.removed", function(mon)
-    if monitor_name(mon) == "DP-2" then
-        apply_undocked()
-    end
+	local name = monitor_name(mon)
+	if name ~= "eDP-1" then
+		apply_undocked()
+	end
 end)
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland XCURSOR_THEME XCURSOR_SIZE")
-    hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Amber'")
-    hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-size 36")
-    hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
-    hl.exec_cmd("swaync")
-    hl.exec_cmd("hyprpaper")
-    hl.exec_cmd("hypridle")
-    hl.exec_cmd("wl-paste --watch cliphist store")
-    hl.exec_cmd("~/.config/waybar/launch.sh")
-    hl.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/wallpaper.py fetch")
-    hl.exec_cmd("hyprctl setcursor Bibata-Modern-Amber 36")
-    hl.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/specific_code_project.py ~/code/ember-data-processing", { workspace = "1 silent" })
-    hl.exec_cmd("google-chrome-stable", { workspace = "2 silent" })
-    hl.exec_cmd("slack", { workspace = "3 silent" })
-    hl.exec_cmd("pear-desktop", { workspace = "7 silent" })
-    hl.exec_cmd("zen-browser", { workspace = "9 silent" })
+	hl.exec_cmd(
+		"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland XCURSOR_THEME XCURSOR_SIZE"
+	)
+	hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Amber'")
+	hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-size 36")
+	hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
+	hl.exec_cmd("swaync")
+	hl.exec_cmd("hyprpaper")
+	hl.exec_cmd("hypridle")
+	hl.exec_cmd("wl-paste --watch cliphist store")
+	hl.exec_cmd("~/.config/waybar/launch.sh")
+	hl.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/wallpaper.py fetch")
+	hl.exec_cmd("hyprctl setcursor Bibata-Modern-Amber 36")
+	hl.exec_cmd(
+		"~/.local/bin/uv run --script ~/.local/bin/custom/rofi/specific_code_project.py ~/code/ember-data-processing",
+		{ workspace = "1 silent" }
+	)
+	hl.exec_cmd("google-chrome-stable", { workspace = "2 silent" })
+	hl.exec_cmd("gtk-launch slack", { workspace = "3 silent" })
+	hl.exec_cmd("pear-desktop", { workspace = "7 silent" })
+	hl.exec_cmd("zen-browser", { workspace = "9 silent" })
 
-    if is_docked() then
-        apply_docked()
-    else
-        apply_undocked()
-    end
+	-- hyprland.start fires before aquamarine finishes enumerating monitors
+	-- that were already connected at boot, so checking synchronously here
+	-- would only ever see eDP-1. Defer briefly so already-connected external
+	-- monitors are visible in hl.get_monitors() by the time we check.
+	hl.timer(check_dock_state, { timeout = 1000, type = "oneshot" })
 end)
-
