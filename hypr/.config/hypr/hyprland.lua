@@ -356,6 +356,25 @@ local function toggle_group_workspace()
 	end, FOCUS_SETTLE)
 end
 
+-- Toggle between dwindle and the centred-master layout configured below.
+-- Switching in promotes the focused window to master, so it lands in the
+-- middle half of the monitor with the rest stacked either side.
+local function toggle_center_master()
+	if hl.get_config("general.layout") == "master" then
+		hl.config({ general = { layout = "dwindle" } })
+		return
+	end
+
+	hl.config({ general = { layout = "master" } })
+	-- The layout swap lands a tick later, so the master layoutmsg has to wait
+	-- for it; dispatching straight away still reaches the dwindle layout,
+	-- which rejects it.
+	hl.timer(function()
+		hl.dispatch(hl.dsp.layout("swapwithmaster", "master"))
+	end, FOCUS_SETTLE)
+end
+
+hl.bind(mainMod .. " + A", toggle_center_master)
 hl.bind(mainMod .. " + M", toggle_group_workspace)
 hl.bind(mainMod .. " + CTRL + R", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("~/.local/bin/custom/cliphist.sh"))
@@ -507,6 +526,20 @@ hl.config({
 	-- -----------------------------------------------------
 	dwindle = {
 		preserve_split = true,
+	},
+	-- Centred-master layout, toggled on demand by SUPER+A (see keybindings).
+	-- The focused window takes the middle half of the screen, the rest stack
+	-- in columns either side of it.
+	master = {
+		orientation = "center",
+		mfact = 0.5,
+		-- Centre the master at every slave count, including none. Anything
+		-- higher makes Hyprland fall back to center_master_fallback (left)
+		-- below the threshold.
+		slave_count_for_center_master = 0,
+		-- Hold the centred position with no slaves at all, instead of letting a
+		-- lone window stretch across the whole monitor.
+		always_keep_position = true,
 	},
 	misc = {
 		disable_hyprland_logo = true,
