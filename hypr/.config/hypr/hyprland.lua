@@ -557,10 +557,19 @@ local function apply_undocked()
 	hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = "1", disabled = false })
 end
 
+-- Hyprland substitutes a headless "FALLBACK" output whenever no real monitor
+-- is left, and it fires monitor.added/removed just like a physical one. Taking
+-- it for an external dock is what used to kill the laptop screen on unplug:
+-- monitor.removed(DP-2) enabled eDP-1, then monitor.added(FALLBACK) docked to
+-- the phantom and disabled it again.
+local function is_external(name)
+	return name ~= nil and name ~= "eDP-1" and name ~= "FALLBACK"
+end
+
 local function find_external_monitor()
-	for _, mon in pairs(hl.get_monitors()) do
+	for _, mon in ipairs(hl.get_monitors()) do
 		local name = monitor_name(mon)
-		if name ~= "eDP-1" then
+		if is_external(name) then
 			return name
 		end
 	end
@@ -578,17 +587,20 @@ end
 
 check_dock_state()
 
+-- Both events re-derive the state rather than assuming it: hl.get_monitors()
+-- has already dropped a monitor by the time monitor.removed fires (verified),
+-- so the list is authoritative in both directions. This also means unplugging
+-- one of two externals re-docks to the other instead of falling back to the
+-- laptop panel, which the previous unconditional apply_undocked() got wrong.
 hl.on("monitor.added", function(mon)
-	local name = monitor_name(mon)
-	if name ~= "eDP-1" then
-		apply_docked(name)
+	if is_external(monitor_name(mon)) then
+		check_dock_state()
 	end
 end)
 
 hl.on("monitor.removed", function(mon)
-	local name = monitor_name(mon)
-	if name ~= "eDP-1" then
-		apply_undocked()
+	if is_external(monitor_name(mon)) then
+		check_dock_state()
 	end
 end)
 
