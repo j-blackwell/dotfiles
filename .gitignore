@@ -8,3 +8,5 @@
 # IPython history
 **/history.sqlite
 **/history-corrupt-*.sqlite
+
+__pycache__

@@ -512,6 +512,11 @@ hl.config({
 		disable_hyprland_logo = true,
 		disable_splash_rendering = true,
 		initial_workspace_tracking = 1,
+		-- Let a fresh lock client take over a dead session lock. Without this,
+		-- a hyprlock crash on resume strands the session: the compositor keeps
+		-- the lock, no new hyprlock can attach, and the only way back in is
+		-- hl.clear_crashed_lockscreen() from another TTY.
+		allow_session_lock_restore = true,
 	},
 	binds = {
 		workspace_back_and_forth = false,

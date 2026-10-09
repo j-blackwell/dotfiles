@@ -32,6 +32,17 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 ### 5. 32-bit & Pacman
 Uncomment `[multilib]` in `/etc/pacman.conf` and add `ILoveCandy`.
 
+### 6. Hyprlock PAM Config
+The default Arch `/etc/pam.d/hyprlock` is missing the PAM header and `account`/`session` stanzas, which causes a SIGABRT crash in `pam_end()` (see [hyprwm/hyprlock#953](https://github.com/hyprwm/hyprlock/issues/953)).
+```bash
+sudo tee /etc/pam.d/hyprlock <<'EOF'
+#%PAM-1.0
+auth       include      login
+account    include      login
+session    include      login
+EOF
+```
+
 ---
 
 ## Automation

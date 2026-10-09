@@ -40,14 +40,14 @@ if [[ "$1" == "exit" ]]; then
   echo ":: Exit"
   terminate_clients
   sleep 0.5
-  hyprctl dispatch exit
+  hyprctl dispatch "hl.dsp.exit()"
   sleep 2
 fi
 
 if [[ "$1" == "lock" ]]; then
   echo ":: Lock"
   sleep 0.5
-  hyprlock
+  ~/.local/bin/custom/hypr-session.sh lock
 fi
 
 if [[ "$1" == "reboot" ]]; then

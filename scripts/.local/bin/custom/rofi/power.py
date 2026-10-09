@@ -6,8 +6,8 @@
 import subprocess
 
 actions = {
-    f"{chr(0xF033E)} Lock Screen": "pidof hyprlock || hyprlock",
-    f"{chr(0xF0343)} Logout": "hyprctl dispatch exit",
+    f"{chr(0xF033E)} Lock Screen": "~/.local/bin/custom/hypr-session.sh lock",
+    f"{chr(0xF0343)} Logout": 'hyprctl dispatch "hl.dsp.exit()"',
     f"{chr(0xF04B2)} Suspend": "systemctl suspend",
     f"{chr(0xF02CA)} Hibernate": "systemctl hibernate",
     f"{chr(0xF0709)} Reboot": "systemctl reboot",
