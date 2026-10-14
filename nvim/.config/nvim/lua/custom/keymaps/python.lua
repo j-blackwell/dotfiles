@@ -37,8 +37,7 @@ end
 
 -- Get symbol at cursor using treesitter
 local function get_symbol_at_cursor()
-	local ts_utils = require("nvim-treesitter.ts_utils")
-	local node = ts_utils.get_node_at_cursor()
+	local node = vim.treesitter.get_node()
 
 	if not node then
 		return nil
@@ -60,11 +59,11 @@ local function get_symbol_at_cursor()
 				-- Get the name node (first child that's an identifier)
 				for child in current:iter_children() do
 					if child:type() == "identifier" then
-						return ts_utils.get_node_text(child)[1]
+						return vim.treesitter.get_node_text(child, 0)
 					end
 				end
 			elseif node_type == "identifier" then
-				return ts_utils.get_node_text(current)[1]
+				return vim.treesitter.get_node_text(current, 0)
 			end
 		end
 

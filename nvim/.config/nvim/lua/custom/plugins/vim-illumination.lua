@@ -1,6 +1,31 @@
 return {
 	"RRethy/vim-illuminate",
 	config = function()
+		-- Upstream calls the deprecated `vim.region` whenever it exists (nvim 0.12+ warns).
+		-- Force its `getregionpos` code path instead.
+		local hl = require("illuminate.highlight")
+		local ns = vim.api.nvim_create_namespace("illuminate.highlight")
+		local kind_hl = {
+			[vim.lsp.protocol.DocumentHighlightKind.Read] = "IlluminatedWordRead",
+			[vim.lsp.protocol.DocumentHighlightKind.Write] = "IlluminatedWordWrite",
+		}
+		hl.range = function(bufnr, start, finish, kind)
+			local region = vim.fn.getregionpos(
+				{ bufnr, start[1] + 1, start[2] + 1 },
+				{ bufnr, finish[1] + 1, finish[2] + 1 },
+				{ type = "v", exclusive = true }
+			)
+			for _, segment in ipairs(region) do
+				local start_pos, finish_pos = unpack(segment)
+				vim.api.nvim_buf_set_extmark(bufnr, ns, start_pos[2] - 1, start_pos[3] - 1, {
+					hl_group = kind_hl[kind] or "IlluminatedWordText",
+					end_col = finish_pos[3],
+					priority = 199,
+					strict = false,
+				})
+			end
+		end
+
 		-- default configuration
 		require("illuminate").configure({
 			-- providers: provider used to get references in the buffer, ordered by priority
