@@ -42,6 +42,9 @@ hl.env("OZONE_PLATFORM", "wayland")
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
 hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("XAUTHORITY", "$HOME/.Xauthority")
+hl.env("BROWSER", "google-chrome-stable")
+hl.env("EDITOR", "nvim")
+hl.env("VISUAL", "nvim")
 
 -- -----------------------------------------------------
 -- Colors
