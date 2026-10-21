@@ -25,6 +25,9 @@ return {
 		},
 	},
 	init = function()
-		require("persistence").load()
+		-- Only restore the session when nvim is opened without file arguments
+		if vim.fn.argc(-1) == 0 then
+			require("persistence").load()
+		end
 	end,
 }
