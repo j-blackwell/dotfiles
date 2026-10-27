@@ -21,6 +21,7 @@ DEV_PKGS=(
 	"neovim" "tree-sitter-cli" "tmux" "git" "github-cli" "lazygit"
 	"npm" "python" "python-pip" "python-virtualenv"
 	"rustup" "helm" "docker" "docker-buildx" "pyenv" "uv"
+	"opentofu"
 )
 
 # Applications
