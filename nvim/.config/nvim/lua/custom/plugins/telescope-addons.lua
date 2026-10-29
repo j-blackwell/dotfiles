@@ -14,6 +14,8 @@ return {
 							"--hidden",
 							"--glob",
 							"!.git/*",
+							"--glob",
+							"!**/fixtures/**",
 							"--sort",
 							"path",
 						},
@@ -25,14 +27,17 @@ return {
 			{
 				"<leader>ft",
 				function()
+					local test_dir = string.format("%s/test", vim.fn.getcwd())
+					if vim.fn.isdirectory(test_dir) == 0 then
+						test_dir = string.format("%s/tests", vim.fn.getcwd())
+					end
 					require("telescope.builtin").find_files({
-						prompt_title = "Search for tmp_local files",
-						cwd = string.format("%s/tmp_local", vim.fn.getcwd()),
+						prompt_title = "Search for test files",
+						cwd = test_dir,
 						file_ignore_patterns = {},
-						no_ignore = true,
 					})
 				end,
-				desc = "[F]ind [t]mp_local files",
+				desc = "[F]ind [t]est files",
 			},
 			{
 				"<leader>fT",

@@ -64,6 +64,9 @@ return {
 						i = {
 							["<CR>"] = function(prompt_bufnr)
 								local selection = action_state.get_selected_entry()
+								if not selection then
+									return
+								end
 								local path = selection.path or selection[1]
 								if vim.fn.isdirectory(path) == 1 then
 									actions.close(prompt_bufnr) -- Close Telescope before opening Oil
