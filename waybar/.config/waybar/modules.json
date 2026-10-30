@@ -105,6 +105,7 @@
     "return-type": "json",
     "format": "{}",
     "on-click": "~/.local/bin/custom/dictation.sh toggle",
+    "on-click-middle": "~/.local/bin/custom/dictation.sh cancel",
     "on-click-right": "systemctl --user restart hyprwhspr",
     "tooltip": true
   },

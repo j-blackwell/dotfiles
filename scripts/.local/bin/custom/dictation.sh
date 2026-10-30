@@ -6,6 +6,7 @@
 #                                    seconds, so ordinary clicks are ignored
 #   dictation.sh release             push-to-talk key up
 #   dictation.sh toggle              start/stop hands-free recording
+#   dictation.sh cancel              discard the current recording without pasting
 #   dictation.sh status              continuous JSON output for waybar
 
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/hyprwhspr"
@@ -39,6 +40,10 @@ release)
 toggle)
 	hyprwhspr record toggle
 	;;
+cancel)
+	rm -f "$PTT_STATE"
+	send cancel
+	;;
 status)
 	last=""
 	while true; do
@@ -61,7 +66,7 @@ status)
 	done
 	;;
 *)
-	echo "Usage: $0 {press [hold_delay]|release|toggle|status}"
+	echo "Usage: $0 {press [hold_delay]|release|toggle|cancel|status}"
 	exit 1
 	;;
 esac

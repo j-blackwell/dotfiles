@@ -442,19 +442,28 @@ hl.bind(
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle"))
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("~/.local/bin/custom/mic-lock.sh toggle"))
 
--- Dictation (hyprwhspr): hold SUPER+R or middle mouse to talk, SUPER+SHIFT+R to toggle.
--- Middle click only starts recording once held past 0.25s, so plain clicks do nothing.
+-- Dictation (hyprwhspr): hold SUPER+R or middle mouse to talk, SUPER+SHIFT+R to toggle,
+-- SUPER+ALT+R to discard. Middle click only starts recording once held past 0.25s,
+-- so plain clicks do nothing.
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh press"))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh release"), { release = true })
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh toggle"))
+hl.bind(mainMod .. " + ALT + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh cancel"))
 hl.bind("mouse:274", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh press 0.25"))
 hl.bind("mouse:274", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh release"), { release = true })
--- Trackpad-only: a swipe can't be held, so it toggles instead.
+-- Trackpad-only: a swipe can't be held, so down toggles and up discards.
 hl.gesture({
 	fingers = 3,
 	direction = "down",
 	action = function()
 		hl.dispatch(hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh toggle"))
+	end,
+})
+hl.gesture({
+	fingers = 3,
+	direction = "up",
+	action = function()
+		hl.dispatch(hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh cancel"))
 	end,
 })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
