@@ -441,6 +441,31 @@ hl.bind(
 )
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle"))
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("~/.local/bin/custom/mic-lock.sh toggle"))
+
+-- Dictation (hyprwhspr): hold SUPER+R or middle mouse to talk, SUPER+SHIFT+R to toggle,
+-- SUPER+ALT+R to discard. Middle click only starts recording once held past 0.25s,
+-- so plain clicks do nothing.
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh press"))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh release"), { release = true })
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh toggle"))
+hl.bind(mainMod .. " + ALT + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh cancel"))
+hl.bind("mouse:274", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh press 0.25"))
+hl.bind("mouse:274", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh release"), { release = true })
+-- Trackpad-only: a swipe can't be held, so down toggles and up discards.
+hl.gesture({
+	fingers = 3,
+	direction = "down",
+	action = function()
+		hl.dispatch(hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh toggle"))
+	end,
+})
+hl.gesture({
+	fingers = 3,
+	direction = "up",
+	action = function()
+		hl.dispatch(hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh cancel"))
+	end,
+})
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"))
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"))
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"))
@@ -646,8 +671,9 @@ hl.on("monitor.removed", function(mon)
 end)
 
 hl.on("hyprland.start", function()
+	-- hyprwhspr is started here rather than enabled: without uwsm, graphical-session.target never activates
 	hl.exec_cmd(
-		"dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=hyprland XCURSOR_THEME XCURSOR_SIZE"
+		"dbus-update-activation-environment --systemd WAYLAND_DISPLAY HYPRLAND_INSTANCE_SIGNATURE XDG_CURRENT_DESKTOP=hyprland XCURSOR_THEME XCURSOR_SIZE && systemctl --user start hyprwhspr"
 	)
 	hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Amber'")
 	hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-size 36")
