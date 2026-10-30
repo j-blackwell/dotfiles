@@ -4,7 +4,9 @@
 #   dictation.sh press [hold_delay]  push-to-talk key down; only starts recording
 #                                    if the key is still held after hold_delay
 #                                    seconds, so ordinary clicks are ignored
-#   dictation.sh release             push-to-talk key up
+#   dictation.sh release [click]     push-to-talk key up; with "click", a release
+#                                    that came too soon to start recording replays
+#                                    a normal middle click instead (via ydotoold)
 #   dictation.sh toggle              start/stop hands-free recording
 #   dictation.sh cancel              discard the current recording without pasting
 #   dictation.sh status              continuous JSON output for waybar
@@ -25,6 +27,11 @@ emit() {
 
 case "$1" in
 press)
+	# Belt and braces: never treat our own replayed click as a new press
+	if [ -n "$(find "$PTT_STATE.replayed" -newermt '-1 second' 2>/dev/null)" ]; then
+		rm -f "$PTT_STATE.replayed"
+		exit 0
+	fi
 	echo "$$" >"$PTT_STATE"
 	sleep "${2:-0}"
 	# A release (or a newer press) during the delay owns the state file now
@@ -35,7 +42,13 @@ press)
 release)
 	state=$(cat "$PTT_STATE" 2>/dev/null)
 	rm -f "$PTT_STATE"
-	[ "$state" = "started" ] && send release
+	if [ "$state" = "started" ]; then
+		send release
+	elif [ -n "$state" ] && [ "$2" = "click" ]; then
+		# 0xC2 = middle button down (0x40) + up (0x80)
+		touch "$PTT_STATE.replayed"
+		ydotool click 0xC2
+	fi
 	;;
 toggle)
 	hyprwhspr record toggle

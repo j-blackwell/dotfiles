@@ -443,14 +443,20 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ tog
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd("~/.local/bin/custom/mic-lock.sh toggle"))
 
 -- Dictation (hyprwhspr): hold SUPER+R or middle mouse to talk, SUPER+SHIFT+R to toggle,
--- SUPER+ALT+R to discard. Middle click only starts recording once held past 0.25s,
--- so plain clicks do nothing.
+-- SUPER+ALT+R to discard. Middle click only starts recording once held past 0.25s;
+-- shorter clicks are replayed through ydotoold, whose virtual mouse is excluded here
+-- so the replayed click reaches the app instead of re-triggering these binds.
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh press"))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh release"), { release = true })
 hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh toggle"))
 hl.bind(mainMod .. " + ALT + R", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh cancel"))
-hl.bind("mouse:274", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh press 0.25"))
-hl.bind("mouse:274", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh release"), { release = true })
+local not_ydotool = { inclusive = false, list = { "ydotoold-virtual-device", "ydotoold-virtual-device-1" } }
+hl.bind("mouse:274", hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh press 0.25"), { device = not_ydotool })
+hl.bind(
+	"mouse:274",
+	hl.dsp.exec_cmd("~/.local/bin/custom/dictation.sh release click"),
+	{ release = true, device = not_ydotool }
+)
 -- Trackpad-only: a swipe can't be held, so down toggles and up discards.
 hl.gesture({
 	fingers = 3,

@@ -31,6 +31,9 @@ EOF
 # Graphics Portals
 systemctl --user enable --now dbus.service
 
+# ydotoold: replays short middle clicks swallowed by the dictation bind (see dictation.sh)
+systemctl --user enable --now ydotool.service
+
 # Fonts
 echo ":: Refreshing font cache..."
 fc-cache -fv
