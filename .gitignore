@@ -10,3 +10,7 @@
 **/history-corrupt-*.sqlite
 
 __pycache__
+
+# hyprwhspr writes runtime symlinks into its (stow-folded) config dir
+hyprwhspr/.config/hyprwhspr/*
+!hyprwhspr/.config/hyprwhspr/config.json

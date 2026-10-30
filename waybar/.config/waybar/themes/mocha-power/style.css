@@ -133,6 +133,21 @@
     background: @background2;
 }
 
+#waybar.main #custom-dictation {
+    padding-right: 8pt;
+    color: @caution;
+    background: @background2;
+}
+
+#waybar.main #custom-dictation.recording {
+    color: @warning;
+    animation: blink-critical-text 0.8s steps(12) infinite alternate;
+}
+
+#waybar.main #custom-dictation.off {
+    color: @sepepator;
+}
+
 #waybar.main #bluetooth {
     color: @misc;
     background: @background1;

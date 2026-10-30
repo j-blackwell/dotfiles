@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/goodroot/hyprwhspr/main/share/config.schema.json",
+  "recording_mode": "auto",
+  "external_bindings": true,
+  "language": "en",
+  "word_overrides": {
+    "hyper land": "Hyprland",
+    "hyper whisper": "hyprwhspr",
+    "big query": "BigQuery",
+    "n vim": "nvim",
+    "neo vim": "Neovim",
+    "t mux": "tmux"
+  },
+  "filter_filler_words": true,
+  "symbol_replacements": false,
+  "transcription_backend": "onnx-asr",
+  "mic_osd_enabled": false,
+  "use_hypr_bindings": true
+}

@@ -40,7 +40,7 @@ FONT_PKGS=(
 AUR_PKGS=(
 	"paru-bin" "wttrbar" "gcalcli" "bluetui" "zen-browser-bin"
 	"slack-desktop" "google-chrome" "dropbox" "duckdb-bin"
-	"claude-desktop"
+	"claude-desktop" "hyprwhspr"
 )
 
 echo ":: Installing Core Packages..."
