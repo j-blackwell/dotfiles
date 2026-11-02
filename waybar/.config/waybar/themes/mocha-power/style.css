@@ -149,8 +149,9 @@
 }
 
 #waybar.main #bluetooth {
-    color: @misc;
-    background: @background1;
+    color: @audio;
+    background: @background2;
+    padding-right: 4pt;
 }
 
 #waybar.main #custom-battery,
@@ -172,6 +173,11 @@
 #waybar.main #clock {
     border-radius: 0pt 9pt 9pt 0pt;
     padding-right: 15px;
+}
+
+#waybar.main #clock.date {
+    border-radius: 0;
+    padding-right: 0;
 }
 
 #waybar.main #window {

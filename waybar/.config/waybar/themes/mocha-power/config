@@ -37,36 +37,86 @@
 
         "modules-right": [
             "custom/spacer1",
-            "custom/updates",
-            "custom/spacer-bg1",
-            "temperature",
-            "custom/spacer-bg1",
-            "custom/sysusage",
-            "custom/spacer-bg1",
-            "custom/bandwidth",
+            "group/perf",
             "custom/spacer2",
             "custom/dictation",
-            "pulseaudio",
+            "group/audio",
             "custom/spacer3",
-            "bluetooth",
-            "custom/spacer-bg1",
-            "hyprland/language",
-            "custom/spacer-bg1",
-            "backlight",
-            "custom/spacer-bg1",
-            "battery",
+            "group/power",
             "custom/spacer4",
             "custom/weather",
             "custom/spacer-bg2",
             "custom/calendar",
             "custom/spacer-bg2",
-            "clock"
+            "group/datetime"
         ],
 
         "group/traym": {
             "orientation": "horizontal",
             "drawer": {},
             "modules": ["custom/trayicon", "tray"]
+        },
+
+        // Hover drawers: the first module is always shown, the rest slide
+        // out to its left on hover.
+        "group/perf": {
+            "orientation": "horizontal",
+            "drawer": { "transition-duration": 300, "transition-left-to-right": false },
+            "modules": [
+                "custom/sysusage",
+                "custom/updates",
+                "custom/spacer-bg1",
+                "temperature",
+                "custom/spacer-bg1",
+                "custom/bandwidth",
+                "custom/spacer-bg1"
+            ]
+        },
+
+        "group/audio": {
+            "orientation": "horizontal",
+            "drawer": { "transition-duration": 300, "transition-left-to-right": false },
+            "modules": [
+                "pulseaudio",
+                "bluetooth",
+                "custom/spacer-bg2"
+            ]
+        },
+
+        "group/power": {
+            "orientation": "horizontal",
+            "drawer": { "transition-duration": 300, "transition-left-to-right": false },
+            "modules": [
+                "battery",
+                "hyprland/language",
+                "custom/spacer-bg1",
+                "backlight",
+                "custom/spacer-bg1"
+            ]
+        },
+
+        "group/datetime": {
+            "orientation": "horizontal",
+            "drawer": { "transition-duration": 300, "transition-left-to-right": false },
+            "modules": [
+                "clock",
+                "clock#date",
+                "custom/spacer-bg2"
+            ]
+        },
+
+        "clock": {
+            "format": "{:%H:%M:%S}",
+            "tooltip-format": "{:%A\n%Y-%m-%d}",
+            "timezone": "Europe/London",
+            "interval": 1
+        },
+
+        "clock#date": {
+            "format": "{:%Y-%m-%d}",
+            "tooltip": false,
+            "timezone": "Europe/London",
+            "interval": 60
         },
 
         "backlight": {
