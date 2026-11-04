@@ -108,6 +108,14 @@
     "tooltip": true
   },
 
+  "custom/screenrec": {
+    "exec": "~/.local/bin/custom/screenrec.sh status",
+    "return-type": "json",
+    "format": "{}",
+    "on-click": "~/.local/bin/custom/screenrec.sh stop",
+    "tooltip": true
+  },
+
   "custom/weather": {
     "format": "{}°",
     "tooltip": true,

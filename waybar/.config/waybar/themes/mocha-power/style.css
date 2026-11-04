@@ -148,6 +148,12 @@
     color: @sepepator;
 }
 
+#waybar.main #custom-screenrec.recording {
+    padding: 0 8pt;
+    color: @warning;
+    background: @background2;
+}
+
 #waybar.main #bluetooth {
     color: @audio;
     background: @background2;

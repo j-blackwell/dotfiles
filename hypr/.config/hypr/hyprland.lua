@@ -239,6 +239,10 @@ hl.bind(
 	hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_text.py")
 )
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("~/.local/bin/uv run --script ~/.local/bin/custom/rofi/screenshot_full.py"))
+-- Screen recording: SHIFT+P records a slurp selection with the mic, CTRL+P asks for the
+-- audio (mic / desktop / both / none) first. Either one stops a running recording.
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("~/.local/bin/custom/screenrec.sh quick"))
+hl.bind(mainMod .. " + CTRL + P", hl.dsp.exec_cmd("~/.local/bin/custom/screenrec.sh menu"))
 hl.bind(
 	mainMod .. " + D",
 	hl.dsp.exec_cmd(
