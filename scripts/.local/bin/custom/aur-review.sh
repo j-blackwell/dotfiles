@@ -48,13 +48,16 @@ sed -E 's/\x1b\[[0-9;]*[A-Za-z]//g' "$RAW" >"$PLAIN"
 
 flags=()    # deterministic hits and failures: "pkgbase: reason"
 findings=() # LLM findings, verbatim
+llm_status="" # one-line LLM verdict; empty if it never ran or failed (failures are flags)
 
 show_diff() {
 	local summary="$WORK/summary"
 	{
 		echo "${BLD}:: AUR review${RST} ${DIM}(${#pkgs[@]} package(s): ${pkgs[*]:-none})${RST}"
 		for f in "${flags[@]}"; do echo "  ${RED}!!${RST} $f"; done
+		[[ -n $llm_status ]] && echo "  $llm_status"
 		for f in "${findings[@]}"; do echo "  ${YEL}LLM${RST} $f"; done
+		echo "${DIM}   Diff opened because of the above. q to quit, then answer paru's prompt.${RST}"
 	} >"$summary"
 	{ cat "$summary"; echo; cat "$RAW"; } | less -R
 	# Repeat the summary so it sits next to paru's "Accept changes?" prompt.
@@ -233,6 +236,9 @@ else
 	elif [[ $verdict == "VERDICT: FLAGGED" ]]; then
 		mapfile -t findings < <(grep -E '^- ' "$WORK/llm_out" | head -10)
 		((${#findings[@]} == 0)) && findings=("flagged without listing findings")
+		llm_status="${YEL}LLM${RST} ($MODEL): ${#findings[@]} finding(s)"
+	else
+		llm_status="${GRN}✓${RST} LLM ($MODEL): no findings"
 	fi
 fi
 
