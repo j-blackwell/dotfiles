@@ -47,60 +47,87 @@ LINES="$WORK/lines"
 cat >"$RAW"
 sed -E 's/\x1b\[[0-9;]*[A-Za-z]//g' "$RAW" >"$PLAIN"
 
-flags=()    # deterministic hits and failures: "pkgbase: reason"
-findings=() # LLM findings, verbatim
-llm_status="" # one-line LLM verdict; empty if it never ran or failed (failures are flags)
+flags=()      # deterministic hits: "pkgbase: reason", or a reason that applies to every package
+findings=()   # LLM findings, verbatim ("- pkgbase: ...")
+llm_status="" # the LLM verdict line
+llm_failed=0  # no usable verdict, so nothing can be trusted as clean
 declare -A change=() # pkgbase -> LLM's one-line summary of what changed
 
-# List packages whose diff isn't shown, with the LLM's summary of each change.
-not_opened() {
-	(($# == 0)) && return
-	local p w=0
-	for p; do ((${#p} > w)) && w=${#p}; done
-	echo "${DIM}   Not opened (passed grep, metadata and LLM checks):${RST}"
-	for p; do printf '     %-*s  %s\n' "$w" "$p" "${change[$p]:-${DIM}(no summary)${RST}}"; done
-}
-
-show_diff() {
-	local summary="$WORK/summary" f p shown
-	# Only show the flagged packages' sections, unless a flag isn't tied to a
-	# package (LLM/API failure, truncation, bad input): then show everything.
-	local -A flagged=() known=()
-	local all=0
+# Work out which packages to open: those named by a flag or LLM finding, or
+# all of them when something can't be tied to one package (LLM/API failure,
+# truncation, bad input). Sets opened (assoc), hidden (array), all.
+triage() {
+	local f p
+	declare -gA opened=() known=()
+	all=$llm_failed
+	hidden=()
 	for p in "${pkgs[@]}"; do known[$p]=1; done
 	for f in "${flags[@]}"; do
 		p="${f%%: *}"
-		if [[ -n ${known[$p]:-} ]]; then flagged[$p]=1; else all=1; fi
+		if [[ -n ${known[$p]:-} ]]; then opened[$p]=1; else all=1; fi
 	done
 	for f in "${findings[@]}"; do
 		p="${f#- }" p="${p%%: *}"
-		if [[ -n ${known[$p]:-} ]]; then flagged[$p]=1; else all=1; fi
+		[[ -n ${known[$p]:-} ]] && opened[$p]=1
 	done
-	local hidden=()
 	if ((all)); then
-		shown="all ${#pkgs[@]} package(s), since not every flag above names a package"
+		for p in "${pkgs[@]}"; do opened[$p]=1; done
+	else
+		for p in "${pkgs[@]}"; do [[ -z ${opened[$p]:-} ]] && hidden+=("$p"); done
+	fi
+}
+
+summary() {
+	local f p w=0 reasons
+	echo "${BLD}:: AUR review${RST} ${DIM}(${#pkgs[@]} package(s): ${pkgs[*]:-none})${RST}"
+	echo
+	echo "$llm_status"
+	echo
+	local general=()
+	for f in "${flags[@]}"; do [[ -z ${known[${f%%: *}]:-} ]] && general+=("$f"); done
+	if ((${#opened[@]} + ${#general[@]})); then
+		echo "${BLD}Diffs to double check:${RST}"
+		for f in "${general[@]}"; do echo "  ${RED}!!${RST} all packages: $f"; done
+		for p in "${pkgs[@]}"; do
+			[[ -z ${opened[$p]:-} ]] && continue
+			reasons=()
+			for f in "${flags[@]}"; do [[ ${f%%: *} == "$p" ]] && reasons+=("${f#*: }"); done
+			for f in "${findings[@]}"; do [[ $f == "- $p: "* ]] && { reasons+=("flagged by LLM"); break; }; done
+			if ((${#reasons[@]} == 0)); then
+				((llm_failed)) && reasons=("no LLM verdict") || reasons=("opened with all packages")
+			fi
+			local tail="${change[$p]:+ ${DIM}- ${change[$p]}${RST}}"
+			if ((${#reasons[@]} == 1)); then
+				echo "  ${RED}!!${RST} $p: ${reasons[0]}$tail"
+			else
+				echo "  ${RED}!!${RST} $p$tail"
+				for f in "${reasons[@]}"; do echo "     - $f"; done
+			fi
+			for f in "${findings[@]}"; do [[ $f == "- $p: "* ]] && echo "     ${YEL}LLM:${RST} ${f#"- $p: "}"; done
+		done
+	fi
+	((${#hidden[@]})) || return 0
+	for p in "${hidden[@]}"; do ((${#p} > w)) && w=${#p}; done
+	echo "${BLD}Diffs not opened${RST} ${DIM}(passed grep, metadata and LLM checks):${RST}"
+	for p in "${hidden[@]}"; do printf '  ⏩ %-*s  %s\n' "$w" "$p" "${change[$p]:-${DIM}(no summary)${RST}}"; done
+}
+
+show_diff() {
+	triage
+	if ((all)); then
 		cp "$RAW" "$WORK/shown"
 	else
-		shown="${!flagged[*]}"
-		for p in "${pkgs[@]}"; do [[ -z ${flagged[$p]:-} ]] && hidden+=("$p"); done
-		awk -v keep="${!flagged[*]}" '
+		awk -v keep="${!opened[*]}" '
 			BEGIN { n = split(keep, k, " "); for (i = 1; i <= n; i++) want[k[i]] = 1 }
 			{ s = $0; gsub(/\033\[[0-9;]*[A-Za-z]/, "", s) }
 			s ~ /^:: .+:$/ { show = (substr(s, 4, length(s) - 4) in want) }
 			show
 		' "$RAW" >"$WORK/shown"
 	fi
-	{
-		echo "${BLD}:: AUR review${RST} ${DIM}(${#pkgs[@]} package(s): ${pkgs[*]:-none})${RST}"
-		for f in "${flags[@]}"; do echo "  ${RED}!!${RST} $f"; done
-		[[ -n $llm_status ]] && echo "  $llm_status"
-		for f in "${findings[@]}"; do echo "  ${YEL}LLM${RST} $f"; done
-		echo "${DIM}   Opened the diff for: $shown. q to quit, then answer paru's prompt.${RST}"
-		not_opened "${hidden[@]}"
-	} >"$summary"
-	{ cat "$summary"; echo; cat "$WORK/shown"; } | less -R
+	summary >"$WORK/summary"
+	{ cat "$WORK/summary"; echo; cat "$WORK/shown"; } | less -R
 	# Repeat the summary so it sits next to paru's "Accept changes?" prompt.
-	cat "$summary"
+	cat "$WORK/summary"
 	exit 0
 }
 
@@ -109,6 +136,7 @@ show_diff() {
 mapfile -t pkgs < <(sed -nE 's/^:: (.+):$/\1/p' "$PLAIN")
 if ((${#pkgs[@]} == 0)); then
 	flags+=("review FAILED: no ':: <pkgbase>:' headers found (paru output format changed?)")
+	llm_status="${RED}!!${RST} LLM verdict: not run"
 	show_diff
 fi
 
@@ -265,7 +293,8 @@ nonce="$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
 ((size > MAX_BYTES)) && flags+=("review is $size bytes; the LLM only saw the first $MAX_BYTES")
 
 if ! command -v claude >/dev/null; then
-	flags+=("${RED}LLM review FAILED${RST}: claude not installed")
+	llm_failed=1
+	llm_status="${RED}!!${RST} LLM verdict: review FAILED: claude not installed"
 else
 	printf '%s:: Reviewing %d AUR package(s) with %s...%s' "$DIM" "${#pkgs[@]}" "$MODEL" "$RST"
 	# Run from the scratch dir so no project CLAUDE.md or settings are picked up.
@@ -279,13 +308,14 @@ else
 		why="exit $rc"
 		((rc == 124)) && why="timed out after ${TIMEOUT}s"
 		err="$(cat "$WORK/llm_err" "$WORK/llm_out" 2>/dev/null | tr '\n' ' ')"
-		flags+=("${RED}LLM review FAILED${RST} ($why): ${err:0:160}")
+		llm_failed=1
+		llm_status="${RED}!! LLM verdict: review FAILED${RST} ($why): ${err:0:160}"
 	elif [[ $verdict == "VERDICT: FLAGGED" ]]; then
 		mapfile -t findings < <(grep -E '^- ' "$WORK/llm_out" | head -10)
 		((${#findings[@]} == 0)) && findings=("flagged without listing findings")
-		llm_status="${YEL}LLM${RST} ($MODEL): ${#findings[@]} finding(s)"
+		llm_status="${YEL}!! LLM verdict: ${#findings[@]} finding(s)${RST} ${DIM}($MODEL)${RST}"
 	else
-		llm_status="${GRN}✓${RST} LLM ($MODEL): no findings"
+		llm_status="${GRN}✓ LLM verdict: update is clean${RST} ${DIM}($MODEL)${RST}"
 	fi
 	# Per-package change summaries; strip control chars, since the diff could steer them.
 	while IFS= read -r line; do
@@ -296,9 +326,9 @@ else
 fi
 
 # --- Result ------------------------------------------------------------------
-if ((${#flags[@]} == 0 && ${#findings[@]} == 0)); then
-	echo "${GRN}✓${RST} AUR review: nothing notable ${DIM}(${#pkgs[@]} package(s))${RST}"
-	not_opened "${pkgs[@]}"
+if ((${#flags[@]} == 0 && ${#findings[@]} == 0 && !llm_failed)); then
+	triage
+	summary
 	exit 0
 fi
 show_diff
