@@ -44,6 +44,23 @@ RAW="$WORK/raw"
 PLAIN="$WORK/plain"
 LINES="$WORK/lines"
 
+# Find the paru that launched us. If it dies mid-review (e.g. it can't read a
+# file in a clone), we only got part of the review and it's no longer waiting.
+# paru runs us via `sh -c`, which execs, so paru is normally our parent. If it
+# already died before we started, we've been reparented to systemd/init.
+paru_pid="" orphaned=0
+case "$(ps -o comm= -p "$PPID" 2>/dev/null)" in
+paru) paru_pid=$PPID ;;
+systemd | init | "") orphaned=1 ;;
+esac
+paru_gone() {
+	((orphaned)) || { [[ -n $paru_pid ]] && ! kill -0 "$paru_pid" 2>/dev/null; } || return 1
+	echo "${BLD}:: AUR review${RST}"
+	echo
+	echo "${RED}!! paru exited before the review finished (see its error above).${RST}"
+	echo "   This review is incomplete and nothing was installed. Fix the error and re-run paru."
+}
+
 cat >"$RAW"
 sed -E 's/\x1b\[[0-9;]*[A-Za-z]//g' "$RAW" >"$PLAIN"
 
@@ -292,6 +309,8 @@ nonce="$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
 } >"$WORK/prompt"
 ((size > MAX_BYTES)) && flags+=("review is $size bytes; the LLM only saw the first $MAX_BYTES")
 
+paru_gone && exit 0 # don't spend an LLM call on a partial review
+
 if ! command -v claude >/dev/null; then
 	llm_failed=1
 	llm_status="${RED}!!${RST} LLM verdict: review FAILED: claude not installed"
@@ -326,6 +345,7 @@ else
 fi
 
 # --- Result ------------------------------------------------------------------
+paru_gone && exit 0
 if ((${#flags[@]} == 0 && ${#findings[@]} == 0 && !llm_failed)); then
 	triage
 	summary
