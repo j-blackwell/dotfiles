@@ -10,7 +10,8 @@
 # Checks, any of which forces the diff open in less:
 #   1. grep backstop on added lines: downloads, eval/base64, pipes to a shell,
 #      setuid, service/persistence/auth-file changes, new source hosts, SKIP
-#      checksums, .install changes. Can't be talked round by prompt injection.
+#      checksums, .install scriptlets and pacman hooks (both run as root). Can't be
+#      talked round by prompt injection.
 #   2. AUR metadata: orphaned, first submitted < 30 days ago, < 5 votes, the
 #      maintainer changed since the version you last accepted, or the AUR API
 #      is unreachable. Maintainer history lives in ~/.local/state/aur-review.
@@ -132,6 +133,7 @@ patterns=(
 	'chmod[[:space:]]+(-[a-zA-Z]+[[:space:]]+)*([2-7][0-7]{3}|[ugoa]*\+[rwx]*s)|setuid/setgid bit'
 	'systemctl[[:space:]]+(--[a-z]+[[:space:]]+)*(enable|start|daemon-reload)|enables/starts a service'
 	'authorized_keys|\.ssh/|/etc/sudoers|crontab|/etc/profile|\.bashrc|\.zshrc|\.profile|persistence or auth config'
+	'libalpm/hooks|^[[:space:]]*\[(Trigger|Action)\]|pacman hook (runs as root on every transaction)'
 )
 for entry in "${patterns[@]}"; do
 	# ENVIRON, not -v, so awk doesn't eat the regex's backslashes.
@@ -140,7 +142,8 @@ for entry in "${patterns[@]}"; do
 	done < <(RE="${entry%|*}" awk -F'\t' '($2 == "+" || $2 == "n") && $3 ~ ENVIRON["RE"]' "$LINES")
 done
 
-# Diff-only checks: normal in a brand-new package, suspicious as a change.
+# Root-code and checksum checks. SKIP and install= only count as a change (both are
+# normal in a new package); .install and .hook files count in new packages too.
 skip_re="(^|[^A-Za-z])['\"]?SKIP['\"]?"
 while IFS=$'\t' read -r pkg kind text; do
 	if [[ $kind == + && $text =~ $skip_re ]]; then
@@ -148,9 +151,13 @@ while IFS=$'\t' read -r pkg kind text; do
 	elif [[ $kind == + && $text =~ ^[[:space:]]*install= ]]; then
 		flags+=("$pkg: install script added/changed: $text")
 	elif [[ $kind == d && $text == *.install ]]; then
-		flags+=("$pkg: .install file changed: $text")
+		flags+=("$pkg: .install file changed (runs as root): $text")
+	elif [[ $kind == f && $text == *.install ]]; then
+		flags+=("$pkg: new package ships a root install scriptlet: $text")
+	elif [[ $kind == [df] && $text == *.hook ]]; then
+		flags+=("$pkg: pacman hook file (runs as root on every transaction): $text")
 	fi
-done < <(awk -F'\t' '$2 == "+" || $2 == "d"' "$LINES")
+done < <(awk -F'\t' '$2 == "+" || $2 == "d" || $2 == "f"' "$LINES")
 
 # Source hosts that appear in added lines but nowhere in the previous version.
 hosts() { grep -oE '[a-z+]+://[^/"'"'"' )]+' | sed -E 's#^[a-z+]+://##; s/^[^@]*@//' | sort -u; }
