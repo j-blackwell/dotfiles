@@ -50,6 +50,16 @@ sed -E 's/\x1b\[[0-9;]*[A-Za-z]//g' "$RAW" >"$PLAIN"
 flags=()    # deterministic hits and failures: "pkgbase: reason"
 findings=() # LLM findings, verbatim
 llm_status="" # one-line LLM verdict; empty if it never ran or failed (failures are flags)
+declare -A change=() # pkgbase -> LLM's one-line summary of what changed
+
+# List packages whose diff isn't shown, with the LLM's summary of each change.
+not_opened() {
+	(($# == 0)) && return
+	local p w=0
+	for p; do ((${#p} > w)) && w=${#p}; done
+	echo "${DIM}   Not opened (passed grep, metadata and LLM checks):${RST}"
+	for p; do printf '     %-*s  %s\n' "$w" "$p" "${change[$p]:-${DIM}(no summary)${RST}}"; done
+}
 
 show_diff() {
 	local summary="$WORK/summary" f p shown
@@ -66,11 +76,13 @@ show_diff() {
 		p="${f#- }" p="${p%%: *}"
 		if [[ -n ${known[$p]:-} ]]; then flagged[$p]=1; else all=1; fi
 	done
+	local hidden=()
 	if ((all)); then
-		shown="all ${#pkgs[@]} package(s)"
+		shown="all ${#pkgs[@]} package(s), since not every flag above names a package"
 		cp "$RAW" "$WORK/shown"
 	else
-		shown="${!flagged[*]}; $((${#pkgs[@]} - ${#flagged[@]})) clean package(s) hidden"
+		shown="${!flagged[*]}"
+		for p in "${pkgs[@]}"; do [[ -z ${flagged[$p]:-} ]] && hidden+=("$p"); done
 		awk -v keep="${!flagged[*]}" '
 			BEGIN { n = split(keep, k, " "); for (i = 1; i <= n; i++) want[k[i]] = 1 }
 			{ s = $0; gsub(/\033\[[0-9;]*[A-Za-z]/, "", s) }
@@ -83,7 +95,8 @@ show_diff() {
 		for f in "${flags[@]}"; do echo "  ${RED}!!${RST} $f"; done
 		[[ -n $llm_status ]] && echo "  $llm_status"
 		for f in "${findings[@]}"; do echo "  ${YEL}LLM${RST} $f"; done
-		echo "${DIM}   Showing the diff for: $shown. q to quit, then answer paru's prompt.${RST}"
+		echo "${DIM}   Opened the diff for: $shown. q to quit, then answer paru's prompt.${RST}"
+		not_opened "${hidden[@]}"
 	} >"$summary"
 	{ cat "$summary"; echo; cat "$WORK/shown"; } | less -R
 	# Repeat the summary so it sits next to paru's "Accept changes?" prompt.
@@ -230,7 +243,9 @@ Routine changes are not findings: version bumps, checksum updates for a new vers
 
 Reply in plain text, no markdown headings.
 Line 1: exactly "VERDICT: CLEAN" or "VERDICT: FLAGGED".
-If FLAGGED, one line per finding, at most 10: "- <pkgbase>: <what and why>, quoting the relevant line". No other text.
+If FLAGGED, one line per finding, at most 10: "- <pkgbase>: <what and why>, quoting the relevant line".
+Then, for every package under review (flagged or not), one line: "= <pkgbase>: <what changed, at most 60 characters>", e.g. "= foo: 1.2 -> 1.3, new checksums" or "= bar: new package, -bin from github.com/owner/bar".
+No other text.
 EOF
 
 size="$(stat -c %s "$PLAIN")"
@@ -272,11 +287,18 @@ else
 	else
 		llm_status="${GRN}✓${RST} LLM ($MODEL): no findings"
 	fi
+	# Per-package change summaries; strip control chars, since the diff could steer them.
+	while IFS= read -r line; do
+		line="${line#= }"
+		p="${line%%: *}" line="${line#*: }"
+		change[$p]="${line:0:80}"
+	done < <(grep -E '^= [^:]+: ' "$WORK/llm_out" 2>/dev/null | tr -d '\000-\010\013-\037\177')
 fi
 
 # --- Result ------------------------------------------------------------------
 if ((${#flags[@]} == 0 && ${#findings[@]} == 0)); then
-	echo "${GRN}✓${RST} AUR review: nothing notable ${DIM}(${pkgs[*]})${RST}"
+	echo "${GRN}✓${RST} AUR review: nothing notable ${DIM}(${#pkgs[@]} package(s))${RST}"
+	not_opened "${pkgs[@]}"
 	exit 0
 fi
 show_diff
