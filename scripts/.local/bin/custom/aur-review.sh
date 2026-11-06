@@ -123,10 +123,38 @@ summary() {
 			for f in "${findings[@]}"; do [[ $f == "- $p: "* ]] && echo "     ${YEL}LLM:${RST} ${f#"- $p: "}"; done
 		done
 	fi
-	((${#hidden[@]})) || return 0
-	for p in "${hidden[@]}"; do ((${#p} > w)) && w=${#p}; done
-	echo "${BLD}Diffs not opened${RST} ${DIM}(passed grep, metadata and LLM checks):${RST}"
-	for p in "${hidden[@]}"; do printf '  ⏩ %-*s  %s\n' "$w" "$p" "${change[$p]:-${DIM}(no summary)${RST}}"; done
+	if ((${#hidden[@]})); then
+		for p in "${hidden[@]}"; do ((${#p} > w)) && w=${#p}; done
+		echo "${BLD}Diffs not opened${RST} ${DIM}(passed grep, metadata and LLM checks):${RST}"
+		for p in "${hidden[@]}"; do printf '  ⏩ %-*s  %s\n' "$w" "$p" "${change[$p]:-${DIM}(no summary)${RST}}"; done
+	fi
+	stale_approvals
+}
+
+# paru only reviews packages it hasn't marked as seen, and marks them seen
+# when you accept, even if the build/install then fails or is cancelled.
+# List clones accepted earlier whose version still isn't installed: those
+# get built without passing through this review.
+stale_approvals() {
+	local d b name ver inst rows=() w=0 r
+	declare -A in_run=()
+	for b in "${pkgs[@]}"; do in_run[$b]=1; done
+	for d in "$CLONE_DIR"/*/; do
+		b="$(basename "$d")"
+		[[ -n ${in_run[$b]:-} || ! -f $d/.SRCINFO ]] && continue
+		[[ "$(git -C "$d" rev-parse -q --verify AUR_SEEN 2>/dev/null)" == "$(git -C "$d" rev-parse -q --verify HEAD 2>/dev/null)" ]] || continue
+		name="$(sed -nE 's/^[[:space:]]*pkgname = (.+)$/\1/p' "$d/.SRCINFO" | head -1)"
+		ver="$(awk -F' = ' '$1 ~ /^[[:space:]]*epoch$/ { e = $2 ":" } $1 ~ /^[[:space:]]*pkgver$/ { v = $2 }
+			$1 ~ /^[[:space:]]*pkgrel$/ { r = $2 } END { if (v) print e v "-" r }' "$d/.SRCINFO")"
+		inst="$(pacman -Q "$name" 2>/dev/null | cut -d' ' -f2)"
+		# Skip packages not installed (not an upgrade) and -git ones built newer.
+		[[ -n $name && -n $ver && -n $inst ]] && (($(vercmp "$inst" "$ver") < 0)) || continue
+		rows+=("$b"$'\t'"$inst -> $ver")
+	done
+	((${#rows[@]})) || return 0
+	for r in "${rows[@]}"; do b="${r%%$'\t'*}"; ((${#b} > w)) && w=${#b}; done
+	echo "${BLD}Approved in an earlier paru run, not re-reviewed${RST} ${DIM}(reset: git -C $CLONE_DIR/<pkg> update-ref -d AUR_SEEN):${RST}"
+	for r in "${rows[@]}"; do printf '  %s⚠%s %-*s  %s\n' "$YEL" "$RST" "$w" "${r%%$'\t'*}" "${r#*$'\t'}"; done
 }
 
 show_diff() {
