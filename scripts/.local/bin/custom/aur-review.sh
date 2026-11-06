@@ -51,15 +51,40 @@ findings=() # LLM findings, verbatim
 llm_status="" # one-line LLM verdict; empty if it never ran or failed (failures are flags)
 
 show_diff() {
-	local summary="$WORK/summary"
+	local summary="$WORK/summary" f p shown
+	# Only show the flagged packages' sections, unless a flag isn't tied to a
+	# package (LLM/API failure, truncation, bad input): then show everything.
+	local -A flagged=() known=()
+	local all=0
+	for p in "${pkgs[@]}"; do known[$p]=1; done
+	for f in "${flags[@]}"; do
+		p="${f%%: *}"
+		if [[ -n ${known[$p]:-} ]]; then flagged[$p]=1; else all=1; fi
+	done
+	for f in "${findings[@]}"; do
+		p="${f#- }" p="${p%%: *}"
+		if [[ -n ${known[$p]:-} ]]; then flagged[$p]=1; else all=1; fi
+	done
+	if ((all)); then
+		shown="all ${#pkgs[@]} package(s)"
+		cp "$RAW" "$WORK/shown"
+	else
+		shown="${!flagged[*]}; $((${#pkgs[@]} - ${#flagged[@]})) clean package(s) hidden"
+		awk -v keep="${!flagged[*]}" '
+			BEGIN { n = split(keep, k, " "); for (i = 1; i <= n; i++) want[k[i]] = 1 }
+			{ s = $0; gsub(/\033\[[0-9;]*[A-Za-z]/, "", s) }
+			s ~ /^:: .+:$/ { show = (substr(s, 4, length(s) - 4) in want) }
+			show
+		' "$RAW" >"$WORK/shown"
+	fi
 	{
 		echo "${BLD}:: AUR review${RST} ${DIM}(${#pkgs[@]} package(s): ${pkgs[*]:-none})${RST}"
 		for f in "${flags[@]}"; do echo "  ${RED}!!${RST} $f"; done
 		[[ -n $llm_status ]] && echo "  $llm_status"
 		for f in "${findings[@]}"; do echo "  ${YEL}LLM${RST} $f"; done
-		echo "${DIM}   Diff opened because of the above. q to quit, then answer paru's prompt.${RST}"
+		echo "${DIM}   Showing the diff for: $shown. q to quit, then answer paru's prompt.${RST}"
 	} >"$summary"
-	{ cat "$summary"; echo; cat "$RAW"; } | less -R
+	{ cat "$summary"; echo; cat "$WORK/shown"; } | less -R
 	# Repeat the summary so it sits next to paru's "Accept changes?" prompt.
 	cat "$summary"
 	exit 0
