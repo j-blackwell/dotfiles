@@ -1,0 +1,366 @@
+#!/usr/bin/env bash
+# wt: one tmux session per git worktree, with nvim and Claude Code side by side.
+#
+# Worktrees live in <repo>/.claude/worktrees/<name>, the same place `claude --worktree`
+# uses, so worktrees made either way show up here and in lazygit's Worktrees tab.
+set -euo pipefail
+
+WT_DIR=".claude/worktrees"
+WT_PROJECTS=${WT_PROJECTS:-$HOME/code} # where to look for repos when run outside one
+
+usage() {
+	cat <<'EOF'
+usage: wt                      pick a worktree with fzf (outside a repo, pick a repo first)
+       wt new <branch>         worktree for <branch>: existing local or origin branch, else a new
+                               branch off origin's default branch. Copies .env files, runs
+                               uv sync / pnpm / npm, then opens a tmux session (nvim + claude)
+       wt open <name|path>     open (or reattach to) the tmux session for a worktree
+       wt rm [-f] <name>...    remove worktrees and their tmux sessions; delete branches that
+                               are merged. -f also throws away uncommitted changes
+       wt prune                remove every clean worktree whose PR is merged or whose
+                               remote branch has been deleted
+       wt ls                   list worktrees
+
+picker keys: enter open · ctrl-n new branch named by the query · ctrl-x remove (tab to multi-select)
+EOF
+}
+
+die() { printf '\033[1;31mwt:\033[0m %s\n' "$*" >&2; exit 1; }
+warn() { printf '\033[1;33mwt:\033[0m %s\n' "$*" >&2; }
+info() { printf '\033[1;34m::\033[0m %s\n' "$*"; }
+
+# ---------------------------------------------------------------- repo helpers
+
+find_root() {
+	local common
+	common=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+	dirname "$common"
+}
+
+pick_repo() {
+	local repo
+	repo=$(find "$WT_PROJECTS" -mindepth 2 -maxdepth 2 -name .git -printf '%h\n' 2>/dev/null |
+		sort | fzf --prompt 'repo> ' --preview 'git -C {} log --oneline --color -10') || exit 0
+	cd "$repo"
+}
+
+default_branch() {
+	git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null && return
+	if git rev-parse --verify --quiet origin/main >/dev/null; then echo origin/main; else echo main; fi
+}
+
+has_origin() { git remote get-url origin >/dev/null 2>&1; }
+
+# One "path<TAB>branch" line per worktree, main checkout first.
+list_worktrees() {
+	git worktree list --porcelain | awk '
+		/^worktree / { p = substr($0, 10) }
+		/^branch /   { b = substr($0, 8); sub("^refs/heads/", "", b) }
+		/^detached/  { b = "(detached)" }
+		/^$/         { if (p != "") print p "\t" b; p = b = "" }
+		END          { if (p != "") print p "\t" b }'
+}
+
+branch_of() { list_worktrees | awk -F'\t' -v p="$1" '$1 == p { print $2 }'; }
+
+wt_name() { if [[ $1 == "$ROOT" ]]; then echo main; else echo "${1##*/}"; fi; }
+
+# tmux session names can't contain "." or ":".
+session_name() {
+	local name=$REPO
+	[[ $1 != "$ROOT" ]] && name="$REPO/${1##*/}"
+	name=${name//./_}
+	echo "${name//:/_}"
+}
+
+has_session() { tmux has-session -t "=$1" 2>/dev/null; }
+
+resolve() {
+	local arg=$1 path
+	if [[ -d $arg ]]; then
+		(cd "$arg" && pwd)
+	elif [[ -d $ROOT/$WT_DIR/$arg ]]; then
+		echo "$ROOT/$WT_DIR/$arg"
+	elif path=$(list_worktrees | awk -F'\t' -v b="$arg" '$2 == b { print $1 }') && [[ -n $path ]]; then
+		echo "$path"
+	else
+		return 1
+	fi
+}
+
+MERGED_PRS=""
+MERGED_PRS_LOADED=0
+pr_merged() {
+	if ((!MERGED_PRS_LOADED)); then
+		MERGED_PRS=$(gh pr list --state merged --limit 300 --json headRefName --jq '.[].headRefName' 2>/dev/null || true)
+		MERGED_PRS_LOADED=1
+	fi
+	grep -qxF -- "$1" <<<"$MERGED_PRS"
+}
+
+upstream_gone() {
+	[[ $(git for-each-ref --format='%(upstream:track)' "refs/heads/$1") == "[gone]" ]]
+}
+
+# Safe to delete the branch: its work is in the default branch, or its PR was
+# squash-merged, or it was pushed and the remote branch has since been deleted.
+branch_done() {
+	local b=$1
+	[[ -n $b && $b != "(detached)" ]] || return 1
+	git merge-base --is-ancestor "$b" "$(default_branch)" 2>/dev/null && return 0
+	pr_merged "$b" && return 0
+	upstream_gone "$b"
+}
+
+# ---------------------------------------------------------------- setup
+
+copy_local_files() {
+	local dest=$1 f
+	local -a files=()
+	if [[ -f $ROOT/.worktreeinclude ]]; then
+		# Untracked files matching .worktreeinclude (gitignore syntax), as `claude --worktree` does.
+		mapfile -t files < <(git ls-files --others --ignored --exclude-from=.worktreeinclude)
+	else
+		for f in .env .env.local .envrc .streamlit/secrets.toml; do
+			if [[ -f $ROOT/$f ]]; then files+=("$f"); fi
+		done
+	fi
+	for f in "${files[@]}"; do
+		if [[ ! -e $dest/$f ]]; then
+			mkdir -p "$dest/$(dirname "$f")"
+			cp -p "$ROOT/$f" "$dest/$f"
+			info "copied $f"
+		fi
+	done
+}
+
+bootstrap() {
+	local path=$1
+	copy_local_files "$path"
+	if [[ -f $path/pyproject.toml ]]; then
+		command -v uv >/dev/null || die "uv isn't on PATH; run uv sync in $path yourself"
+		info "uv sync"
+		(cd "$path" && env -u VIRTUAL_ENV uv sync) || warn "uv sync failed; fix it in the session"
+	fi
+	if [[ -f $path/pnpm-lock.yaml ]] && command -v pnpm >/dev/null; then
+		info "pnpm install"
+		(cd "$path" && pnpm install --frozen-lockfile) || warn "pnpm install failed"
+	elif [[ -f $path/package-lock.json ]] && command -v npm >/dev/null; then
+		info "npm ci"
+		(cd "$path" && npm ci) || warn "npm ci failed"
+	fi
+	if [[ -f $path/.envrc ]] && command -v direnv >/dev/null; then
+		direnv allow "$path"
+	fi
+}
+
+# ---------------------------------------------------------------- commands
+
+open_session() {
+	local path=$1 s claude_cmd=claude
+	s=$(session_name "$path")
+	if ! has_session "$s"; then
+		# Pick up the last Claude conversation in this worktree, if there is one.
+		if [[ -d $HOME/.claude/projects/$(sed 's/[^[:alnum:]]/-/g' <<<"$path") ]]; then
+			claude_cmd="claude --continue"
+		fi
+		local pane # target the pane by id: "=name" exact matching only works for sessions, not panes
+		pane=$(tmux new-session -d -P -F '#{pane_id}' -s "$s" -c "$path" -n code "zsh -ic 'nvim; exec zsh'")
+		tmux split-window -v -l 45% -t "$pane" -c "$path" "zsh -ic '$claude_cmd; exec zsh'"
+	fi
+	if [[ -n ${TMUX:-} ]]; then
+		tmux switch-client -t "=$s"
+	else
+		tmux attach-session -t "=$s"
+	fi
+}
+
+cmd_open() {
+	local path
+	path=$(resolve "${1:?usage: wt open <name|path>}") || die "no worktree called $1"
+	open_session "$path"
+}
+
+cmd_new() {
+	local branch=${1:?usage: wt new <branch>} name path existing base
+	git check-ref-format --branch "$branch" >/dev/null 2>&1 || die "not a valid branch name: $branch"
+	name=${branch//\//-}
+	path="$ROOT/$WT_DIR/$name"
+
+	existing=$(list_worktrees | awk -F'\t' -v b="$branch" '$2 == b { print $1 }')
+	if [[ -n $existing ]]; then
+		info "$branch is already checked out at $existing"
+		open_session "$existing"
+		return
+	fi
+	[[ -e $path ]] && die "$path already exists but isn't a worktree for $branch"
+
+	if has_origin; then
+		info "fetching origin"
+		git fetch --quiet --prune origin || warn "fetch failed; using local refs"
+	fi
+	if git show-ref --verify --quiet "refs/heads/$branch"; then
+		git worktree add "$path" "$branch"
+	elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+		git worktree add --track -b "$branch" "$path" "origin/$branch"
+	else
+		base=$(default_branch)
+		info "new branch $branch off $base"
+		git worktree add --no-track -b "$branch" "$path" "$base"
+	fi
+	bootstrap "$path"
+	open_session "$path"
+}
+
+# Returns non-zero (without exiting) so `wt rm a b` carries on past a dirty worktree.
+remove_one() {
+	local path=$1 force=$2 branch s
+	if [[ $path == "$ROOT" ]]; then
+		warn "won't remove the main checkout"
+		return 1
+	fi
+	branch=$(branch_of "$path")
+	s=$(session_name "$path")
+
+	if [[ $force != 1 && -n $(git -C "$path" status --porcelain 2>/dev/null) ]]; then
+		git -C "$path" status --short
+		warn "$(wt_name "$path") has uncommitted changes; commit them or use wt rm -f"
+		return 1
+	fi
+
+	# Explicit returns: callers use `remove_one ... ||`, which switches off set -e in here,
+	# and nothing below (branch delete, session kill) may run if git refused.
+	if [[ $force == 1 ]]; then
+		git worktree remove --force "$path" || return 1
+	else
+		git worktree remove "$path" || return 1
+	fi
+	info "removed worktree $(wt_name "$path")"
+
+	if branch_done "$branch"; then
+		git branch -D "$branch" >/dev/null
+		info "deleted branch $branch (merged)"
+	elif [[ -n $branch && $branch != "(detached)" ]]; then
+		info "kept branch $branch (not merged); delete with: git branch -D $branch"
+	fi
+
+	# Last, because if wt is running inside this session, killing it kills wt too.
+	if has_session "$s"; then
+		if [[ -n ${TMUX:-} && $(tmux display-message -p '#S') == "$s" ]]; then
+			tmux switch-client -l 2>/dev/null || tmux switch-client -n 2>/dev/null || true
+		fi
+		tmux kill-session -t "=$s"
+	fi
+}
+
+cmd_rm() {
+	local force=0 arg path failed=0
+	if [[ ${1:-} == -f ]]; then
+		force=1
+		shift
+	fi
+	(($#)) || die "usage: wt rm [-f] <name>..."
+	git worktree prune
+	for arg in "$@"; do
+		if ! path=$(resolve "$arg"); then
+			warn "no worktree called $arg"
+			failed=1
+			continue
+		fi
+		remove_one "$path" "$force" || failed=1
+	done
+	return "$failed"
+}
+
+cmd_prune() {
+	local path branch
+	local -a done_paths=()
+	git worktree prune
+	if has_origin; then git fetch --quiet --prune origin || warn "fetch failed; using local refs"; fi
+	while IFS=$'\t' read -r path branch; do
+		[[ $path == "$ROOT/$WT_DIR/"* ]] || continue
+		# Not branch_done: a fresh, empty branch is an ancestor of main too, but isn't finished.
+		pr_merged "$branch" || upstream_gone "$branch" || continue
+		if [[ -n $(git -C "$path" status --porcelain 2>/dev/null) ]]; then
+			warn "skipping $(wt_name "$path"): merged but has uncommitted changes (wt rm -f to force)"
+			continue
+		fi
+		done_paths+=("$path")
+		printf '  %s (%s)\n' "$(wt_name "$path")" "$branch"
+	done < <(list_worktrees)
+	if ((${#done_paths[@]} == 0)); then
+		info "nothing to prune"
+		return
+	fi
+	read -rp "remove these ${#done_paths[@]} worktrees? [y/N] " reply
+	[[ $reply == [yY]* ]] || return 0
+	for path in "${done_paths[@]}"; do remove_one "$path" 0 || true; done
+}
+
+cmd_ls() {
+	local path branch mark
+	while IFS=$'\t' read -r path branch; do
+		mark=' '
+		if has_session "$(session_name "$path")"; then mark='●'; fi
+		printf '%s\t%s\t%s\t%s\n' "$mark" "$(wt_name "$path")" "$branch" "$path"
+	done < <(list_worktrees)
+}
+
+cmd_pick() {
+	local out rc query key
+	local -a sel=()
+	set +e
+	out=$(cmd_ls | fzf --multi --print-query --expect=ctrl-n,ctrl-x \
+		--delimiter '\t' --with-nth 1..3 --prompt "$REPO> " \
+		--header 'enter open · ctrl-n new branch from query · ctrl-x remove · ● has a session' \
+		--preview 'git -C {4} -c color.status=always status -sb; echo; git -C {4} log --oneline --color -15')
+	rc=$?
+	set -e
+	((rc == 130)) && exit 0
+
+	query=$(sed -n 1p <<<"$out")
+	key=$(sed -n 2p <<<"$out")
+	mapfile -t sel < <(sed -n '3,$p' <<<"$out" | cut -f4)
+
+	if [[ $key == ctrl-x ]]; then
+		((${#sel[@]})) || exit 0
+		cmd_rm "${sel[@]}"
+	elif [[ $key == ctrl-n || ${#sel[@]} -eq 0 ]]; then
+		[[ -n $query ]] || exit 0
+		cmd_new "$query"
+	else
+		open_session "${sel[0]}"
+	fi
+}
+
+# ---------------------------------------------------------------- main
+
+case ${1:-} in
+-h | --help | help)
+	usage
+	exit 0
+	;;
+esac
+
+ROOT=$(find_root) || {
+	[[ $# -eq 0 ]] || die "not in a git repo"
+	pick_repo
+	ROOT=$(find_root) || die "not in a git repo"
+}
+REPO=$(basename "$ROOT")
+cd "$ROOT" # never sit inside a worktree we might delete
+
+cmd=${1:-pick}
+(($#)) && shift
+case $cmd in
+pick) cmd_pick ;;
+new) cmd_new "$@" ;;
+open) cmd_open "$@" ;;
+rm) cmd_rm "$@" ;;
+prune) cmd_prune ;;
+ls) cmd_ls | column -t -s $'\t' ;;
+*)
+	usage >&2
+	exit 1
+	;;
+esac

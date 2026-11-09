@@ -1,0 +1,2 @@
+# Claude Code / wt worktrees live inside the repo; keep them out of git status, rg, fd and telescope.
+.claude/worktrees/
