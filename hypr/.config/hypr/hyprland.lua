@@ -589,6 +589,12 @@ hl.config({
 		-- hl.clear_crashed_lockscreen() from another TTY.
 		allow_session_lock_restore = true,
 	},
+	render = {
+		-- Don't flip the monitor into HDR when a fullscreen window (e.g. Chrome)
+		-- advertises HDR content. The switch needs a full modeset on amdgpu, which
+		-- blanks the screen for a couple of seconds entering and leaving fullscreen.
+		cm_auto_hdr = 0,
+	},
 	binds = {
 		workspace_back_and_forth = false,
 		allow_workspace_cycles = true,
