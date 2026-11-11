@@ -377,7 +377,7 @@ local function toggle_center_master()
 	-- for it; dispatching straight away still reaches the dwindle layout,
 	-- which rejects it.
 	hl.timer(function()
-		hl.dispatch(hl.dsp.layout("swapwithmaster", "master"))
+		hl.dispatch(hl.dsp.layout("swapwithmaster master"))
 	end, FOCUS_SETTLE)
 end
 
