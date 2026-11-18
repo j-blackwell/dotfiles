@@ -14,6 +14,5 @@
   "filter_filler_words": true,
   "symbol_replacements": false,
   "transcription_backend": "onnx-asr",
-  "mic_osd_enabled": false,
-  "use_hypr_bindings": true
+  "mic_osd_enabled": false
 }
