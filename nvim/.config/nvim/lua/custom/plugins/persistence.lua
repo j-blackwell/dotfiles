@@ -1,5 +1,7 @@
 return {
 	"folke/persistence.nvim",
+	-- Off in the scratch call note (custom/scratchnote.lua): no session restore/save, no dashboard.
+	cond = vim.env.SCRATCHNOTE == nil,
 	event = "VimEnter",
 	config = function()
 		require("persistence").setup({

@@ -19,6 +19,7 @@ return {
 	),
 	map("n", "<Leader>d%", ":call delete(@%)<CR>:bp<bar>bd#<CR>", { desc = "[D]elete the file of the current buffer" }),
 	map("n", "<Leader>bd", "<CMD>bd<CR>", { desc = "[B]uffer [d]elete" }),
+	map("n", "<Leader>bD", "<CMD>bd!<CR>", { desc = "[B]uffer [D]elete (force)" }),
 	map("n", "<Leader>ba", "<CMD>bufdo bwipeout<CR>", { desc = "[B]uffer delete [a]ll" }),
 	map("n", "<Leader>bA", "<CMD>bufdo bwipeout!<CR>", { desc = "[B]uffer delete [A]ll (force)" }),
 	map("n", "<Leader>cL", ":LspStop<CR>:LspStart<CR>", { desc = "Restart the [L]SP" }),

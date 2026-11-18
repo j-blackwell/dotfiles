@@ -197,6 +197,17 @@ hl.window_rule({
 	float = true,
 })
 
+-- Scratch call note (SUPER+N): lives on its own special workspace.
+hl.window_rule({
+	match = {
+		class = "^(scratchnote)$",
+	},
+	float = true,
+	size = "monitor_w*0.3 monitor_h*0.5",
+	move = "monitor_w*0.35 monitor_h*0.04",
+	workspace = "special:scratch",
+})
+
 local mainMod = "SUPER"
 
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd("kitty"))
@@ -381,7 +392,20 @@ local function toggle_center_master()
 	end, FOCUS_SETTLE)
 end
 
+-- Scratch call note: show/hide it if its window exists, otherwise open one. The script
+-- reattaches to the `scratchnote` tmux session if the window was closed by accident.
+local function toggle_scratchnote()
+	if #hl.get_windows({ class = "scratchnote" }) > 0 then
+		hl.dispatch(hl.dsp.workspace.toggle_special("scratch"))
+	else
+		hl.dispatch(
+			hl.dsp.exec_cmd("kitty --class scratchnote -e ~/.local/bin/uv run --script ~/.local/bin/custom/scratchnote.py")
+		)
+	end
+end
+
 hl.bind(mainMod .. " + A", toggle_center_master)
+hl.bind(mainMod .. " + N", toggle_scratchnote)
 hl.bind(mainMod .. " + M", toggle_group_workspace)
 hl.bind(mainMod .. " + CTRL + R", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("~/.local/bin/custom/cliphist.sh"))
@@ -510,6 +534,9 @@ hl.config({
 		numlock_by_default = true,
 		follow_mouse = 1,
 		mouse_refocus = false,
+		-- Clicks reach the normal workspace behind a special workspace of only floating
+		-- windows, e.g. the scratch call note (SUPER+N).
+		special_fallthrough = true,
 		sensitivity = 0,
 		touchpad = {
 			natural_scroll = true,
