@@ -2,7 +2,8 @@
 -- `scratchnote` tmux session. The note is an unnamed in-memory buffer (so a stray :w fails
 -- with E32) until written with one of the buffer-local maps:
 --   <leader>nw  write to the notes repo, stay open (no commit)
---   <leader>nx  write, commit that file, push in the background, close
+--   <leader>nx  write, commit that file, push in the background, close; then
+--               scratchnote_actions.py offers its action items for Google Tasks
 --   <leader>nd  close without saving (refuses once the note has been written)
 --   <leader>nD  delete the written file (if any) and close
 -- Closing nvim ends the tmux session, which closes the kitty window.
@@ -65,6 +66,10 @@ local function write_commit_close()
 		"git pull -q --rebase --autostash && git push -q "
 			.. "|| notify-send -a 'Scratch note' -u critical 'Push failed' \"$(pwd)\"",
 	}, { cwd = dir, detach = true })
+	-- scratchnote_actions.py runs after nvim exits and turns this note's actions into tasks.
+	if vim.env.SCRATCHNOTE_COMMITTED then
+		vim.fn.writefile({ path }, vim.env.SCRATCHNOTE_COMMITTED)
+	end
 	vim.cmd("qa!")
 end
 

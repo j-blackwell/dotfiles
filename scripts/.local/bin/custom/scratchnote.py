@@ -215,16 +215,28 @@ def main() -> None:
     header_file = RUNTIME_DIR / "header.md"
     header_file.write_text(header(event, now))
 
+    # <leader>nx writes the committed note's path here for scratchnote_actions.py.
+    committed = RUNTIME_DIR / "committed"
+    committed.unlink(missing_ok=True)
+
     env = {
         "SCRATCHNOTE": "1",
         "SCRATCHNOTE_NAME": name,
         "SCRATCHNOTE_DIR": str(NOTES_DIR),
         "SCRATCHNOTE_HEADER": str(header_file),
+        "SCRATCHNOTE_EVENT": event.title if event else "",
+        "SCRATCHNOTE_COMMITTED": str(committed),
     }
     tmux = ["tmux", "new-session", "-s", SESSION, "-c", str(NOTES_DIR.parent.parent)]
     for key, value in env.items():
         tmux += ["-e", f"{key}={value}"]
-    tmux += ["nvim", "-c", "lua require('custom.scratchnote').start()"]
+    # After nvim exits, extract actions from a committed note into Google Tasks.
+    tmux += [
+        "sh",
+        "-c",
+        "nvim -c \"lua require('custom.scratchnote').start()\"; "
+        "exec ~/.local/bin/uv run --script ~/.local/bin/custom/scratchnote_actions.py",
+    ]
     tmux += [";", "set-option", "-t", f"={SESSION}:", "status", "off"]
     sys.stdout.flush()
     os.execvp("tmux", tmux)

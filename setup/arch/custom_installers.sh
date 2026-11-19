@@ -26,6 +26,14 @@ if [ -d "$HOME/.oh-my-zsh" ]; then
 	[ ! -d "$ZSH_CUSTOM/plugins/fast-syntax-highlighting" ] && git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$ZSH_CUSTOM/plugins/fast-syntax-highlighting"
 fi
 
+# Global npm packages, installed under ~/.local (bin/ is on PATH) rather than npm's
+# default /usr prefix, which needs sudo and is pacman's territory.
+NPM_GLOBAL_PKGS=(
+	"@googleworkspace/cli" # gws: Google Tasks for the scratch call note (scratchnote_actions.py)
+)
+echo ":: Installing global npm packages..."
+npm install -g --prefix "$HOME/.local" --allow-scripts="$(IFS=,; echo "${NPM_GLOBAL_PKGS[*]}")" "${NPM_GLOBAL_PKGS[@]}"
+
 # Add other custom/curl-based installers here as needed
 # Example:
 # if ! command -v some-tool &> /dev/null; then
