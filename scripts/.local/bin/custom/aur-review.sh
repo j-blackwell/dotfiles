@@ -42,7 +42,7 @@ WORK="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/aur-review.XXXXXX")"
 trap 'rm -rf "$WORK"' EXIT
 RAW="$WORK/raw"
 PLAIN="$WORK/plain"
-LINES="$WORK/lines"
+ROWS_TSV="$WORK/lines"
 
 # Find the paru that launched us. If it dies mid-review (e.g. it can't read a
 # file in a clone), we only got part of the review and it's no longer waiting.
@@ -206,7 +206,7 @@ awk '
 		else if (line ~ /^-/) print pkg "\t-\t" substr(line, 2)
 		else if (line ~ /^ /) print pkg "\tc\t" substr(line, 2)
 	}
-' "$PLAIN" >"$LINES"
+' "$PLAIN" >"$ROWS_TSV"
 
 # Patterns checked against added lines and every line of new packages.
 patterns=(
@@ -225,7 +225,7 @@ for entry in "${patterns[@]}"; do
 	# ENVIRON, not -v, so awk doesn't eat the regex's backslashes.
 	while IFS=$'\t' read -r pkg _ text; do
 		flags+=("$pkg: ${entry##*|}: ${text:0:120}")
-	done < <(RE="${entry%|*}" awk -F'\t' '($2 == "+" || $2 == "n") && $3 ~ ENVIRON["RE"]' "$LINES")
+	done < <(RE="${entry%|*}" awk -F'\t' '($2 == "+" || $2 == "n") && $3 ~ ENVIRON["RE"]' "$ROWS_TSV")
 done
 
 # Root-code and checksum checks. SKIP and install= only count as a change (both are
@@ -243,14 +243,14 @@ while IFS=$'\t' read -r pkg kind text; do
 	elif [[ $kind == [df] && $text == *.hook ]]; then
 		flags+=("$pkg: pacman hook file (runs as root on every transaction): $text")
 	fi
-done < <(awk -F'\t' '$2 == "+" || $2 == "d" || $2 == "f"' "$LINES")
+done < <(awk -F'\t' '$2 == "+" || $2 == "d" || $2 == "f"' "$ROWS_TSV")
 
 # Source hosts that appear in added lines but nowhere in the previous version.
 hosts() { grep -oE '[a-z+]+://[^/"'"'"' )]+' | sed -E 's#^[a-z+]+://##; s/^[^@]*@//' | sort -u; }
 for pkg in "${pkgs[@]}"; do
-	added="$(awk -F'\t' -v p="$pkg" '$1 == p && $2 == "+" { print $3 }' "$LINES" | hosts)"
+	added="$(awk -F'\t' -v p="$pkg" '$1 == p && $2 == "+" { print $3 }' "$ROWS_TSV" | hosts)"
 	[[ -z $added ]] && continue
-	old="$(awk -F'\t' -v p="$pkg" '$1 == p && ($2 == "-" || $2 == "c") { print $3 }' "$LINES" | hosts)"
+	old="$(awk -F'\t' -v p="$pkg" '$1 == p && ($2 == "-" || $2 == "c") { print $3 }' "$ROWS_TSV" | hosts)"
 	while read -r h; do
 		flags+=("$pkg: new source host: $h")
 	done < <(comm -23 <(echo "$added") <(echo "$old"))
