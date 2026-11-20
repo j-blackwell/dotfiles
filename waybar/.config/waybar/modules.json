@@ -80,7 +80,7 @@
   "custom/calendar": {
     "format": "{}",
     "interval": 60,
-    "exec": "~/.local/bin/custom/calendar-countdown.sh",
+    "exec": "~/.local/bin/custom/calendar_agenda.py waybar",
     "return-type": "json",
     "max-length": 25,
     "on-click": "xdg-open https://calendar.google.com/calendar/u/0/r/week?pli=1"
