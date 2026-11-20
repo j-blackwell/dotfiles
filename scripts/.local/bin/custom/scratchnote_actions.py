@@ -5,7 +5,7 @@
 
 Runs in the scratch note's tmux pane after nvim exits (see scratchnote.py). Does nothing
 unless <leader>nx committed a note, in which case nvim wrote its path to
-$SCRATCHNOTE_COMMITTED. Claude (Haiku, via `claude -p`) extracts the actions, a rofi
+$SCRATCHNOTE_COMMITTED. Claude (Haiku, via `claude -p`) extracts the actions, an fzf
 checklist picks which to keep, and gws adds them to the default Google Tasks list.
 Tasks that fail to add are kept in pending-tasks.md, opened here for editing and
 retried on the next run.
@@ -105,23 +105,21 @@ def label(task: dict) -> str:
 
 
 def choose(tasks: list[dict]) -> list[dict]:
-    """Rofi checklist: Shift+Enter ticks rows, Enter adds them (or just the highlighted row)."""
-    rows = ["Add all"] + [label(t) for t in tasks]
+    """fzf checklist with every action ticked: Tab unticks, Enter adds the ticked ones."""
+    rows = [f"{i}\t{label(t)}" for i, t in enumerate(tasks)]
     result = subprocess.run(
         [
-            "rofi", "-dmenu", "-i", "-multi-select", "-format", "i",
-            "-p", "Add to Google Tasks",
-            "-mesg", "Shift+Enter to tick, Enter to add, Esc for none",
-            "-ballot-selected-str", "☑ ", "-ballot-unselected-str", "☐ ",
+            "fzf", "--multi", "--no-sort", "--layout=reverse", "--info=hidden",
+            "--delimiter=\t", "--with-nth=2..", "--bind=load:select-all",
+            "--marker=☑ ", "--prompt=Add to Google Tasks: ",
+            "--header=Tab to (un)tick · Enter to add ticked · Esc for none",
         ],
         input="\n".join(rows),
-        capture_output=True,
+        stdout=subprocess.PIPE,
         text=True,
     )
-    picked = {int(i) for i in result.stdout.split() if i.isdigit()}
-    if 0 in picked:
-        return tasks
-    return [tasks[i - 1] for i in sorted(picked) if 0 < i <= len(tasks)]
+    picked = {int(line.split("\t", 1)[0]) for line in result.stdout.splitlines() if line[:1].isdigit()}
+    return [t for i, t in enumerate(tasks) if i in picked]
 
 
 def add_task(task: dict) -> bool:
