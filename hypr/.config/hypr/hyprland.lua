@@ -404,8 +404,86 @@ local function toggle_scratchnote()
 	end
 end
 
+-- Call windows (a Meet tab dragged out into its own Chrome window, a popped-out Slack
+-- huddle) share special:scratch with the note, so SUPER+N shows the note over the call.
+-- Matched by title only when the window opens, never on later title changes, so the
+-- main Chrome/Slack window isn't moved just because a Meet tab or huddle has focus.
+local CALL_RECHECK = { timeout = 1500, type = "oneshot" }
+
+local function is_call_window(win)
+	local title = win.title or ""
+	if win.class == "google-chrome" then
+		return title:find("^Meet %- ") ~= nil or title:find("^Meet – ") ~= nil
+	end
+	if win.class == "slack" then
+		-- The main Slack window is the first one; anything later titled "huddle" is a call.
+		return #hl.get_windows({ class = "slack" }) > 1 and title:lower():find("huddle") ~= nil
+	end
+	return false
+end
+
+-- Float the call left of the note (which sits at 35–65% across), so neither covers the other.
+local function send_to_scratch(win)
+	local target = "address:" .. win.address
+	hl.dispatch(hl.dsp.window.move({ workspace = "special:scratch", follow = false, window = target }))
+	if not win.floating then
+		hl.dispatch(hl.dsp.window.float({ window = target })) -- toggles, hence the check
+	end
+	local mon = win.monitor
+	if mon then
+		hl.dispatch(hl.dsp.window.resize({ x = mon.width * 0.33, y = mon.height * 0.6, window = target }))
+		hl.dispatch(hl.dsp.window.move({ x = mon.x + mon.width * 0.01, y = mon.y + mon.height * 0.04, window = target }))
+		-- Bring the layer up with the call focused (toggling while it's showing would hide it).
+		local shown = mon.active_special_workspace
+		if not (shown and shown.name == "special:scratch") then
+			hl.dispatch(hl.dsp.workspace.toggle_special("scratch"))
+		end
+	end
+	hl.dispatch(hl.dsp.focus({ window = target }))
+end
+
+-- Hyprland opens new windows on the special workspace whenever it's showing, so with the
+-- note up every app launched would join it. Send them to the regular workspace behind
+-- instead, keeping the note floating on top (clicks reach them via special_fallthrough).
+local function keep_off_scratch(win)
+	local regular = win.monitor and win.monitor.active_workspace
+	if not regular then
+		return
+	end
+	local target = "address:" .. win.address
+	hl.dispatch(hl.dsp.window.move({ workspace = regular.id, follow = false, window = target }))
+	hl.dispatch(hl.dsp.focus({ window = target }))
+end
+
+hl.on("window.open", function(win)
+	if win.class == "scratchnote" then
+		return
+	end
+	local on_scratch = win.workspace and win.workspace.name == "special:scratch"
+	if is_call_window(win) then
+		-- Even if it opened straight onto the showing layer, it still needs floating/placing.
+		send_to_scratch(win)
+		return
+	end
+	if on_scratch then
+		keep_off_scratch(win)
+	end
+	-- Chrome and Slack can map a window before giving it its real title.
+	if win.class == "google-chrome" or win.class == "slack" then
+		local address = win.address
+		hl.timer(function()
+			local later = hl.get_window("address:" .. address)
+			if later and later.workspace and later.workspace.name ~= "special:scratch" and is_call_window(later) then
+				send_to_scratch(later)
+			end
+		end, CALL_RECHECK)
+	end
+end)
+
 hl.bind(mainMod .. " + A", toggle_center_master)
 hl.bind(mainMod .. " + N", toggle_scratchnote)
+-- Show/hide the note + call layer without starting a new note.
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.workspace.toggle_special("scratch"))
 hl.bind(mainMod .. " + M", toggle_group_workspace)
 hl.bind(mainMod .. " + CTRL + R", hl.dsp.exec_cmd("hyprctl reload"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("~/.local/bin/custom/cliphist.sh"))
