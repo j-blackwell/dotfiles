@@ -4,7 +4,7 @@
 """Turn a committed scratch call note's action items into Google Tasks.
 
 Runs in the scratch note's tmux pane after nvim exits (see scratchnote.py). Does nothing
-unless <leader>nx committed a note, in which case nvim wrote its path to
+unless <leader>nc committed a note, in which case nvim wrote its path to
 $SCRATCHNOTE_COMMITTED. Claude (Haiku, via `claude -p`) extracts the actions, an fzf
 checklist picks which to keep, and gws adds them to the default Google Tasks list.
 Tasks that fail to add are kept in pending-tasks.md, opened here for editing and
@@ -160,7 +160,7 @@ def write_pending(tasks: list[dict]) -> None:
         PENDING.unlink(missing_ok=True)
         return
     PENDING.parent.mkdir(parents=True, exist_ok=True)
-    lines = ["<!-- Scratch note tasks not yet in Google Tasks; retried on the next <leader>nx. -->"]
+    lines = ["<!-- Scratch note tasks not yet in Google Tasks; retried on the next <leader>nc. -->"]
     for t in tasks:
         due = f"due {t['due']}" if t.get("due") else ""
         lines.append(f"- [ ] {t['title']} | {due} | {t.get('notes', '').replace(chr(10), ' · ')}")

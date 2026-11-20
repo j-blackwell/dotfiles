@@ -2,7 +2,7 @@
 -- `scratchnote` tmux session. The note is an unnamed in-memory buffer (so a stray :w fails
 -- with E32) until written with one of the buffer-local maps:
 --   <leader>nw  write to the notes repo, stay open (no commit)
---   <leader>nx  write, commit that file, push in the background, close; then
+--   <leader>nc  write, commit that file, push in the background, close; then
 --               scratchnote_actions.py offers its action items for Google Tasks
 --   <leader>nd  close without saving (refuses once the note has been written)
 --   <leader>nD  delete the written file (if any) and close
@@ -76,7 +76,7 @@ end
 local function discard()
 	if path then
 		notify(
-			"Note saved at " .. vim.fn.fnamemodify(path, ":~") .. ": <leader>nx to commit, <leader>nD to delete",
+			"Note saved at " .. vim.fn.fnamemodify(path, ":~") .. ": <leader>nc to commit, <leader>nD to delete",
 			vim.log.levels.WARN
 		)
 		return
@@ -105,7 +105,7 @@ function M.start()
 		vim.keymap.set("n", lhs, fn, { buffer = buf, desc = desc })
 	end
 	map("<leader>nw", write, "Scratch [n]ote: [w]rite, stay open")
-	map("<leader>nx", write_commit_close, "Scratch [n]ote: write, commit + push, close")
+	map("<leader>nc", write_commit_close, "Scratch [n]ote: write, [c]ommit + push, close")
 	map("<leader>nd", discard, "Scratch [n]ote: [d]iscard and close")
 	map("<leader>nD", delete_and_close, "Scratch [n]ote: [D]elete written file and close")
 end

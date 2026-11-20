@@ -127,7 +127,7 @@ def main() -> None:
     header_file = RUNTIME_DIR / "header.md"
     header_file.write_text(header(event, now))
 
-    # <leader>nx writes the committed note's path here for scratchnote_actions.py.
+    # <leader>nc writes the committed note's path here for scratchnote_actions.py.
     committed = RUNTIME_DIR / "committed"
     committed.unlink(missing_ok=True)
 
